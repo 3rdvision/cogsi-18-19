@@ -17,9 +17,12 @@ How to insert an image:
 
 Documentation for Students:
 
-- [I'm a relative reference to a repository file](student1/)
+<!---
+Os links para outras paginas markdown devem ser sempre relativos a pasta actual
+-->
+- [Student 1](student1/)
 
-- [I'm a relative reference to a repository file](student2/)
+- [Student 2](student2/)
 
 # 1. Overview
 

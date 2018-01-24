@@ -19,15 +19,18 @@ How to insert an image:
 
 Documentation of Iterations:
 
+<!---
+Os links para outras paginas markdown devem ser sempre relativos a pasta actual
+-->
 - [Iteration 1](it1/)
 
 - [Iteration 2](it2/)
 
-- [Iteration 3](student1/it3/)
+- [Iteration 3](it3/)
 
-- [Iteration 4](student1/it4/)
+- [Iteration 4](it4/)
 
-- [Iteration 5](student1/it5/)
+- [Iteration 5](it5/)
 
 # 1. Overview
 
