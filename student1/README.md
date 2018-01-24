@@ -19,9 +19,9 @@ How to insert an image:
 
 Documentation of Iterations:
 
-- [Iteration 1](student1/it1/)
+- [Iteration 1](it1/)
 
-- [Iteration 2](student1/it2/)
+- [Iteration 2](it2/)
 
 - [Iteration 3](student1/it3/)
 
