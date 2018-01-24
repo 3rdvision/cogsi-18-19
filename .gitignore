@@ -1,0 +1,40 @@
+# This is an example .gitignore file that you may use to specify which files you do not want to track in the repository.
+# You may create specific .gitignore files inside folders of the repository to have specific rules for specific folders.
+
+# Directories #
+build/
+bin/
+target/
+
+.metadata
+.ideia
+
+# OS Files #
+.DS_Store
+desktop.ini
+Thumbs.db
+
+*.class
+*.iml
+*.ipr
+*.iws
+*~
+*#
+.*.swp
+.*.swo
+*.patch
+.settings
+._*
+
+# Gradle
+.gradle
+/build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# GWT
+**/gwt-unitCache/
+
+# Specific to the project
+**/reports/
