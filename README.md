@@ -13,7 +13,7 @@ The specific database that is configured is H2 (<http://www.h2database.com/html/
 
 How to insert an image:
 
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+![alt text](https://bitbucket.org/atb/cogsi-17-18-rep-template/raw/master/imgs/git.jpg?fileviewer=file-view-default "Logo Title Text 1")
 
 # 1. Overview
 
