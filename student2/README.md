@@ -17,13 +17,6 @@ How to insert an image:
 
 Documentation for Students:
 
-<!---
-Os links para outras paginas markdown devem ser sempre relativos a pasta actual
--->
-- [Student 1](student1/)
-
-- [Student 2](student2/)
-
 # 1. Overview
 
 This is an eclipse project. You can open it with eclipse. It includes also a build.gradle file and you can (and should) execute the building tasks from a terminal or console using gradle (the project uses the gradle wrapper, so you can use gradlew instead of gradle). The single exception is for Debug that requires the use of Eclipse.
