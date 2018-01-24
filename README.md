@@ -20,7 +20,7 @@ Documentation for Students:
 
 - [I'm a relative reference to a repository file](student2/README.md)
 
-- [Another type of link](https://bitbucket.org/atb/cogsi-17-18-rep-template/raw/master/student/README.md?fileviewer=file-view-default)
+- [Another type of link](https://bitbucket.org/atb/cogsi-17-18-rep-template/src/master/student/README.md?fileviewer=file-view-default)
  
 # 1. Overview
 
