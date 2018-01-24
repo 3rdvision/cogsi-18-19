@@ -15,6 +15,8 @@ How to insert an image:
 
 ![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
 
+![alt text](https://bitbucket.org/atb/cogsi-17-18-rep-template/raw/master/imgs/git.jpg?fileviewer=file-view-default "Logo Title Text 1")
+
 # 1. Overview
 
 This is an eclipse project. You can open it with eclipse. It includes also a build.gradle file and you can (and should) execute the building tasks from a terminal or console using gradle (the project uses the gradle wrapper, so you can use gradlew instead of gradle). The single exception is for Debug that requires the use of Eclipse.
