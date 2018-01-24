@@ -11,6 +11,10 @@ You can find a very simple tutorial on JPA in (<https://www.tutorialspoint.com/j
 
 The specific database that is configured is H2 (<http://www.h2database.com/html/main.html>).
 
+How to insert an image:
+
+![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+
 # 1. Overview
 
 This is an eclipse project. You can open it with eclipse. It includes also a build.gradle file and you can (and should) execute the building tasks from a terminal or console using gradle (the project uses the gradle wrapper, so you can use gradlew instead of gradle). The single exception is for Debug that requires the use of Eclipse.
@@ -29,7 +33,7 @@ You should open this project by using the option "File/Import..."/"Existing Proj
 
 It may be necessary to configure the location of the GWT SDK in the properties of the eclipse project. With the right mouse button in the cms project select "Properties". Then "GWT/General Settings". Verify if the GWT SDK settings points to your location (and version should be 2.8.1).
 
-## 2.2 Gradle Properties 
+## 2.2 Gradle Properties
 
 The file `gradle.properties` contains the location of the GWT SDK and the location of Ant. You should update this file to match the location of these tools in your system (the Ant part should be optional).
 
@@ -43,7 +47,7 @@ Install the GWT Eclipse Plugin by using "Help/Eclipse Markeplace..." and serch f
 
 ## 3.2 GWT SDK
 
-You should download and install the GWT SDK into your computer (http://www.gwtproject.org). 
+You should download and install the GWT SDK into your computer (http://www.gwtproject.org).
 
 # 4. How to Run
 
@@ -67,7 +71,7 @@ The server starts and the screen displays something like this:
 	2017-10-06 15:55:49.036:INFO:oejs.Server:main: Started @2218ms
 	> Building 83% > :gwtRun
 
-Now you can open Chrome and use the following url to access the application: [http://localhost:8080/Showcase.html](http://localhost:8080/Showcase.html)	
+Now you can open Chrome and use the following url to access the application: [http://localhost:8080/Showcase.html](http://localhost:8080/Showcase.html)
 
 To stop the server open another terminal/console and type `gradle gwtStop`
 
@@ -84,7 +88,7 @@ After that, in Eclipse, you can create a new configuration of type "Remote Java 
 
 In the "Source" tab also select the CMS project.
 
-**Notes:** 
+**Notes:**
 
 - You must run the server application before running the new run configuration of eclipse. This is because the debug port 8000 must be open by the server before starting the debug in Eclipse.
 
@@ -114,7 +118,7 @@ Setup the "GWT Development Mode (Dev Mode)" in this way:
 - In tab "Arguments"
 
 	1. In program arguments enter:
-	
+
 	-remoteUI "${gwt_remote_ui_server_port}:${unique_id}" -logLevel INFO -codeServerPort 9997 -war /workspaces/odsoft/2017/odsoft-edom-2017/cms/src/main/webapp -port 8888 pt.isep.cms.Showcase
 
 Note: You should replace "/workspaces/odsoft/2017/odsoft-edom-2017/cms/src/main/webapp" by your own path.
@@ -131,10 +135,10 @@ Create a "Launch Chrome" configuration:
 
 	1. In URL enter "http://127.0.0.1:8888/Showcase.html"
 	2. In Project select the "cms" project
-	
-**Notes:** 
 
-- Remember that the server must be running! You should run the server in debug mode using a running configuration in Eclipse or the `gwtDev` task in gradle.	
+**Notes:**
+
+- Remember that the server must be running! You should run the server in debug mode using a running configuration in Eclipse or the `gwtDev` task in gradle.
 
 - Confirm that the port number is correct (either 8888 or other you have setup)
 
@@ -149,7 +153,7 @@ Some common commands:
 **gradle gwtRun**: the jetty web serever is started (using port 8080) to serve the application. You can open the application in a browser with the following url <http://127.0.0.1:8080/Contacts.html>
 
 **gradle gwtDev**: gwt starts in development mode. You should be able to update the code of the application and the changes should be automatically visible. You can open the application in a browser with the following url <http://127.0.0.1:8080/Contacts.html>
- 
+
 # 8. Credits
 
 This project is based on examples from the GWT project (http://www.gwtproject.org), specially:
@@ -157,4 +161,3 @@ This project is based on examples from the GWT project (http://www.gwtproject.or
 - http://samples.gwtproject.org/samples/Showcase/Showcase.html
 
 - http://www.gwtproject.org/articles/mvp-architecture.html
-
