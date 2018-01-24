@@ -16,8 +16,10 @@ How to insert an image:
 ![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
 
 Documentation for Students:
-- [I'm a relative reference to a repository file](student1/README.md)
-- [I'm a relative reference to a repository file](student2/README.md)
+
+- [I'm a relative reference to a repository file](student1/)
+
+- [I'm a relative reference to a repository file](student2/)
 
 # 1. Overview
 
