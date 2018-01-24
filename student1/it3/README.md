@@ -1,7 +1,7 @@
-STUDENT 1
+STUDENT 1 - ITERATION 3
 ===============================
 
-# 0. Notes on Database Support
+# 0. Introduction
 
 This branch includes support for database using JPA (Java Persistence API) (<https://docs.oracle.com/javaee/6/tutorial/doc/bnbpz.html>).
 
@@ -13,79 +13,26 @@ The specific database that is configured is H2 (<http://www.h2database.com/html/
 
 How to insert an image:
 
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
-
-![alt text](https://bitbucket.org/atb/cogsi-17-18-rep-template/raw/master/imgs/git.jpg?fileviewer=file-view-default "Logo Title Text 1")
-
-Documentation of Iterations:
-
-- [Iteration 1](student1/it1)
-
-- [Iteration 2](student1/it2)
-
-- [Iteration 3](student1/it3)
-
-- [Iteration 4](student1/it4)
-
-- [Iteration 5](student1/it5)
+![alt text](https://bitbucket.org/atb/cogsi-17-18-rep-template/raw/master/student1/it1/imgs/git2.jpg?fileviewer=file-view-default "Logo Title Text 1")
 
 # 1. Overview
-
-This is an eclipse project. You can open it with eclipse. It includes also a build.gradle file and you can (and should) execute the building tasks from a terminal or console using gradle (the project uses the gradle wrapper, so you can use gradlew instead of gradle). The single exception is for Debug that requires the use of Eclipse.
-
-To use this project you should download it from bitbucket (in Bitbucket use option "Downloads"). **Do not clone it!**
-
-You should then copy the downloaded files into a folder inside your repository. **Commit these new files into your own repository.**
-
-To use this project first create an eclipse workspace **outside** of the folder that contains your repository.
-
-You should open this project by using the option "File/Import..."/"Existing Projects into Workspace" and select as root directory the root of your repository. Select the project to import (i..e, CMS). **Do NOT check "Copy projects into workspace"**
 
 # 2. Important Remarks
 
 ## 2.1 GWT SDK Settings in Eclipse
 
-It may be necessary to configure the location of the GWT SDK in the properties of the eclipse project. With the right mouse button in the cms project select "Properties". Then "GWT/General Settings". Verify if the GWT SDK settings points to your location (and version should be 2.8.1).
 
 ## 2.2 Gradle Properties
 
-The file `gradle.properties` contains the location of the GWT SDK and the location of Ant. You should update this file to match the location of these tools in your system (the Ant part should be optional).
-
 # 3. Eclipse Requirements
-
-Before importing the project you should be sure to provide the following requirements.
 
 ## 3.1 GWT Eclipse Plugin
 
-Install the GWT Eclipse Plugin by using "Help/Eclipse Markeplace..." and serch for and install "GWT Ecplise Plugin".
-
 ## 3.2 GWT SDK
 
-You should download and install the GWT SDK into your computer (http://www.gwtproject.org).
 
 # 4. How to Run
 
-Execute in a terminal `gradle gwtRun`
-
-The server starts and the screen displays something like this:
-
-	:compileJava UP-TO-DATE
-	:processResources UP-TO-DATE
-	:classes UP-TO-DATE
-	:gwtCompile UP-TO-DATE
-	:war UP-TO-DATE
-	:gwtRun
-	Listening for transport dt_socket at address: 8000
-	2017-10-06 15:55:47.055:INFO::main: Logging initialized @232ms
-	2017-10-06 15:55:47.066:INFO:oejr.Runner:main: Runner
-	2017-10-06 15:55:47.271:INFO:oejs.Server:main: jetty-9.2.7.v20150116
-	2017-10-06 15:55:48.992:INFO:oejsh.ContextHandler:main: Started o.e.j.w.WebAppContext@68ceda24...
-	2017-10-06 15:55:48.993:WARN:oejsh.RequestLogHandler:main: !RequestLog
-	2017-10-06 15:55:49.033:INFO:oejs.ServerConnector:main: Started ServerConnector@177630fe{HTTP/1.1}{0.0.0.0:8080}
-	2017-10-06 15:55:49.036:INFO:oejs.Server:main: Started @2218ms
-	> Building 83% > :gwtRun
-
-Now you can open Chrome and use the following url to access the application: [http://localhost:8080/Showcase.html](http://localhost:8080/Showcase.html)
 
 To stop the server open another terminal/console and type `gradle gwtStop`
 
@@ -93,14 +40,6 @@ To stop the server open another terminal/console and type `gradle gwtStop`
 
 ## 5.1 Running the Application from the command line
 
-To debug the server code you can run the application as described earlier.
-
-After that, in Eclipse, you can create a new configuration of type "Remote Java Application". Enter the following data:
-- Project: CMS (select the CMS project)
-- Server: localhost
-- Port: 8000
-
-In the "Source" tab also select the CMS project.
 
 **Notes:**
 
