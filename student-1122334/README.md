@@ -21,15 +21,15 @@ Documentation of Iterations:
 
 [//]: # (Os links para outras paginas markdown devem ser sempre relativos a pasta actual)
 
-- [Iteration 1](it1/)
+- [Iteration 1](sp1/)
 
-- [Iteration 2](it2/)
+- [Iteration 2](sp2/)
 
-- [Iteration 3](it3/)
+- [Iteration 3](sp3/)
 
-- [Iteration 4](it4/)
+- [Iteration 4](sp4/)
 
-- [Iteration 5](it5/)
+- [Iteration 5](sp5/)
 
 # 1. Overview
 
