@@ -15,13 +15,27 @@ How to insert an image:
 
 ![alt text](https://bitbucket.org/atb/cogsi-17-18-rep-template/raw/master/imgs/git.jpg?fileviewer=file-view-default "Logo Title Text 1")
 
-Documentation for Students:
 
 [//]: # (Os links para outras paginas markdown devem ser sempre relativos a pasta actual)
 
-- [Student 1](student1/)
+Documentation for Students:
 
-- [Student 2](student2/)
+|Student            |Documentation                        |
+|-------------------|-------------------------------------|
+| Joao Amaral       |[Student 1122334](student-1122334/)  |
+| Maria Ferreira    |[Student 1133224](student-1133224/)  |
+
+**Documentation for each Sprint**
+
+|Sprint  | Student 1                              | Student 2                             | Student 3                             | Student 4                             |
+|--------|----------------------------------------|---------------------------------------|---------------------------------------|---------------------------------------|
+| **1**  |[Student 1122334](student-1122334/it1)  |[Student 1133224](student-1133224/it1) |                                       |                                       |
+| **2**  |																				|																				|																				|																				|  	
+| **3**  |																				|																				|																				|																				|  	
+| **4**  |																				|																				|																				|																				|  	
+| **5**  |																				|																				|																				|																				|  	
+
+
 
 - [Another type of link](https://bitbucket.org/atb/cogsi-17-18-rep-template/src/master/student/?fileviewer=file-view-default)
 
