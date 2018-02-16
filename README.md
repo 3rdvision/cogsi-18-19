@@ -7,17 +7,17 @@ COGSI has a project that runs during all the semester. The project is divided in
 
 The goals for each Sprint will be published in Moodle, in a specific document.
 
-Each and every student should develop is work for each sprint in is own individual repository (that should be similar to this one).
+Each and every student should develop his/her work for each sprint in his/her own individual repository (that should be similar to this one).
 
 By the end of each Sprint the teacher will select a small set of students to submit and present their developments for the Sprint.
 
 The selected students should submit their work to the common repository of the lab class.
 
-The selected students must present and discuss their work during a Sprint Review session (usually schedule to a lecture).
+The selected students must present and discuss their work during a Sprint Review session (usually scheduled to a lecture).
 
 Students get feedback from their work during the Sprint Review. They may improve their work and present the improvements at a special session by the end of the semester.
 
-In the Sprint Review students (presenting and attending) should compare the different presented solutions and select of the them as the "team solution".  
+In the Sprint Review students (presenting and attending) should compare the different presented solutions and select one of the them as the "team solution".  
 
 **Each student must present one Sprint during the semester!**
 
@@ -33,7 +33,7 @@ The common repository is used to submit each sprint delivery (only the selected 
 
 Each student will have an individual repository. Students should use this repository for their development. Only the contents of these repositories are used for assessment!
 
-Students should use Bitbucket Issues to reference their work in each repository. They should commit regularly.
+Students should use Bitbucket Issues to reference their work/commits in the repository. They should commit regularly.
 
 **Students should not use the Bitbucket Wiki for documentation. All documentation should be done in the repository using markdown and the suggested MD files, following the structure that is exemplified here.**
 
