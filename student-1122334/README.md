@@ -6,8 +6,8 @@ STUDENT **Joao Amaral** (1122334)
 
 |Sprint  | Documentation for the Sprint |
 |--------|----------------------------------------|
-| **1**  |[Sprint 1](student-1122334/sp1)         |
-| **2**  |[Sprint 2](student-1122334/sp2)         |																				
-| **3**  |[Sprint 3](student-1122334/sp3)         |																			
-| **4**  |[Sprint 4](student-1122334/sp4)         |																			
-| **5**  |[Sprint 5](student-1122334/sp5)         |																			
+| **1**  |[Sprint 1](sp1)         |
+| **2**  |[Sprint 2](sp2)         |																				
+| **3**  |[Sprint 3](sp3)         |																			
+| **4**  |[Sprint 4](sp4)         |																			
+| **5**  |[Sprint 5](sp5)         |																			
