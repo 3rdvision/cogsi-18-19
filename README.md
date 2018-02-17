@@ -114,4 +114,7 @@ For instance, the next image was generated with this command. The PlantUml file 
 
 ![Image generated with PlantUML](https://bitbucket.org/mei-isep/cogsi-17-18-rep-template/raw/master/net.png?fileviewer=file-view-default "Logo Title Text 1")
 
+![Image generated with PlantUML](net.png)
+
+
 **Note:** You will need to have **gradle** installed in your system to execute the command.
