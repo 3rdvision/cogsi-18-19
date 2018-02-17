@@ -106,8 +106,10 @@ This repository includes a **build.gradle** file that can be used to generated i
 
 For processing all **.puml** files in the repository simply type in the root:
 
-	gradle renderPlantUml
+	gradle
 
-For instance, the next image was generated with this command. The PlantUml file is **net.puml** (located in the root of the repository) and the resulting image is **net.png** (also located in the rrot of the repository).
+For instance, the next image was generated with this command. The PlantUml file is **net.puml** (located in the root of the repository) and the resulting image is **net.png** (also located in the root of the repository).
 
 ![alt text](https://bitbucket.org/atb/cogsi-17-18-rep-template/raw/master/net.png?fileviewer=file-view-default "Logo Title Text 1")
+
+**Note:** You will need to have **gradle** installed in your system to execute the command.

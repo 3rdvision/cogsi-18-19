@@ -1,44 +1,7 @@
-apply plugin: "java"
-apply plugin: "application"
-
-mainClassName = 'com.twu.calculator.CalculatorApp'
-group = 'calculator'
-version = '1.0-SNAPSHOT'
-description = "Calculator Console App"
-
-repositories {
-	mavenCentral()
-}
-
-dependencies {
-	testCompile 'junit:junit:4.12'
-	testCompile 'com.github.stefanbirkner:system-rules:1.16.1'
-}
-
-javadoc {
-    source = sourceSets.main.allJava
-    options.overview = "src/main/javadoc/overview.html" // relative to source root
-}
-
-
-// task renderPlantUml(type: RenderPlantUmlTask) {
-//      inputDir = file("${projectDir}/src/main/puml")
-//      inputFiles = fileTree(dir: "${projectDir}/src/main/puml", include: '**/*.puml')
-//      outputDir = file("${buildDir}/docs/javadoc")
-//}
+defaultTasks 'renderPlantUml'
 
 task renderPlantUml(type: RenderPlantUmlTask) {
       inputDir = file("${projectDir}")
       inputFiles = fileTree(dir: "${projectDir}", include: '**/*.puml')
       outputDir = file("${projectDir}")
-}
-
-// To execute the app
-task runApp (type: JavaExec, dependsOn: classes){
-    /* Can pass all the properties: */
-    systemProperties System.getProperties()
-    standardInput = System.in
-    description = "Running the Calculator"
-    main = "com.twu.calculator.CalculatorApp"
-    classpath = sourceSets.main.runtimeClasspath
 }

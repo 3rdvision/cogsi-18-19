@@ -165,7 +165,9 @@ class RenderPlantUmlTask extends DefaultTask {
       }
 
       //println "Rendering ${relPumlPath} to ${projectPath.relativize(png.toPath()).toString()}"
-      reader.generateImage(new FileOutputStream(png), new FileFormatOption(FileFormat.PNG))
+      FileOutputStream outFile=new FileOutputStream(png)
+      reader.generateImage(outFile, new FileFormatOption(FileFormat.PNG))
+      outFile.close();
     }
 
     //===================================
