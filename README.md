@@ -50,8 +50,8 @@ For instance, if my name is Maria Ferreira and I have the Student Team Number 2 
 
 |Student Team Number |Student Name                         |Link         											  |
 |--------------------|-------------------------------------|------------------------------------|
-| **1**      				 | Joao Amaral 												 |[Student 1122334](student-1122334/) |
-| **2**    					 | Maria Ferreira											 |[Student 1133224](student-1133224/) |
+| **1**      				 | Joao Amaral 												 |[Joao Amaral](student-1122334/) |
+| **2**    					 | Maria Ferreira											 |[Maria Ferreira](student-1133224/) |
 | **3**    					 | 																		 |																	  |
 | **4**    					 | 																		 |																	  |
 | **5**    					 | 																		 |																	  |
@@ -79,13 +79,13 @@ For instance, if my name is Maria Ferreira and I have the Student Team Number 2 
 
 # 4. Sprints
 
-The following table is used to register the work of the students that are selected to present at each Sprint Review. For instance, if I am Student "Maria Ferreira" and I was selected to make the second presentation for Sprint 1 then I should update this table as illustrated.
+The following table is used to register the work of the students that are selected to present at each Sprint Review. For instance, if I am Student "Maria Ferreira" (1133224) and I was selected to make the second presentation for Sprint 1 then I should update this table as illustrated.
 
 **Documentation for each Sprint**
 
 |Sprint  | Sprint Presentation 1                  |  Sprint Presentation 2                |  Sprint Presentation 3                |  Sprint Presentation 4                |  Sprint Presentation 5                |
 |--------|----------------------------------------|---------------------------------------|---------------------------------------|---------------------------------------|---------------------------------------|
-| **1**  |[Student 1122334](student-1122334/sp1)  |[Student 1133224](student-1133224/sp1) |                                       |                                       |																				|
+| **1**  |[Joao Amaral](student-1122334/sp1)  |[Maria Ferreira](student-1133224/sp1) |                                       |                                       |																				|
 | **2**  |																				|																				|																				|																				|  																			|
 | **3**  |																				|																				|																				|																				|  																			|
 | **4**  |																				|																				|																				|																				|  																			|
@@ -94,7 +94,19 @@ The following table is used to register the work of the students that are select
 
 # 5. How to Use These README.md Type of Files
 
+All documentation about the project should be included in readme.MD files in the repository.
 
+Every student will work on his/her own folder in the repository. The folder should have a name following the pattern **student-**<student registration number>. For instance, for "Maria Ferreira" the folder should be **student-113324**.
+
+Inside the student folder there should be a subfolder for each Sprint. Their names should be **sp1** through **sp5**. Inside these folder there should be a file named **readme.MD** with documentation about the Sprint. All the files/artifacts used for the Sprint should be inside these folders (or in subfolders of theses folders).
+
+
+
+- using markdown
+
+- making references to images
+
+- using plantuml and generating images
 
 
 - [Another type of link](https://bitbucket.org/atb/cogsi-17-18-rep-template/src/master/student/?fileviewer=file-view-default)
