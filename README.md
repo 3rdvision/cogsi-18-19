@@ -31,7 +31,9 @@ The common repository is used to submit each sprint delivery (only the selected 
 
 **individual repository**
 
-Each student will have an individual repository. Students should use this repository for their development. Only the contents of these repositories are used for assessment!
+Each student will have an individual repository. Students should use this repository for their development.
+
+Each student will have a Student Team Number. The number of the lab class and the Student Team Number will be used to identify the student individual repository. For instance, for the student with Student Team Number 3 of the lab class 2 the individual repository will have the name: **cogsi-rep-17-18-g2-s3**
 
 Students should use Bitbucket Issues to reference their work/commits in the repository. They should commit regularly.
 
