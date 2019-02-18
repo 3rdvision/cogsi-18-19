@@ -3,19 +3,19 @@ COGSI Project Repository
 
 # 1. General Notes about the Project of COGSI
 
-COGSI has a project that runs during all the semester. The project is divided into 7 Parts (P1.1-P1.5, P2.1 and P2.2). Each Sprint has an average duration of 2 weeks.
+COGSI has a project that runs during all the semester. The project is divided into 7 Parts (P1.1-P1.5, P2.1 and P2.2). Each part has an average duration of 2 weeks.
 
-The goals for each Sprint will be published in Moodle, in a specific document.
+The goals for each part will be published in Moodle, in a specific document.
 
 Each and every student should develop his/her work for each part in his/her own individual repository (that should be similar to this one).
 
-By the end of each part the teacher will select a small set of students to submit and present their developments for that part.
+Teacher will select a small set of students to submit and present their developments for each part.
 
-The selected students should submit their work to the common repository.
+The selected students should submit their work to the common repository (a repository similar to this one that will be published in moodle).
 
 The selected students must present and discuss their work during a special session (usually scheduled to a lecture).
 
-Students get feedback from their work during this session. They may improve their work based on that feedback.
+Students get feedback for their work during this session. They may improve their future work based on that feedback.
 
 **Each student only does one presentation during the semester!**
 
@@ -38,8 +38,6 @@ Students should use Bitbucket Issues to reference their work/commits in the repo
 **Students should not use the Bitbucket Wiki for documentation. All documentation should be done in the repository using markdown and the suggested MD files, following the structure that is exemplified here.**
 
 **Both repositories must have the same structure of folders!**
-
-[//]: # (Os links para outras paginas markdown devem ser sempre relativos a pasta actual)
 
 # 3. Individual Pages/Folders
 
