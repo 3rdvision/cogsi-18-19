@@ -282,6 +282,10 @@ define service {
 }
 ```
 
-9- Restart nagios service.
+9- Edit `templates.cfg` to delete line 81 `contact_groups                  admins             ; Notifications get sent to the admins by default` so that admins stop being a default group of notifiations when a host becomes CRITICAL.
 
-10- Try to put down tomcat service or manually issue a notification from the web nagios configuration panel.
+10- Repeat the previous step but for the service template and delete the line  `contact_groups                  admins             ; Notifications get sent to the admins by default` so that admins stop being a default group of notifiations when a service becomes CRITICAL.
+
+10- Restart nagios service.
+
+11- Try to put down tomcat service or manually issue a custom notification targeted to the HTTP-Tomcat service from the web nagios configuration panel.
