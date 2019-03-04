@@ -206,3 +206,82 @@ define service {
 
 3- Restart nagios service.
 
+## Create contacts in nagios and notify services by e-mail (using Gmail)
+
+1- Create a gmail account and in that account, enable the account access for less secure apps in security options of gmail.
+
+2- Install pre-requisites `apt-get install libio-socket-ssl-perl libnet-ssleay-perl perl`
+
+3- Download sendEmail `apt-get install libio-socket-ssl-perl libnet-ssleay-perl perl` 
+
+4- Install sendEmail
+
+Extract
+`tar -zxvf sendEmail-v1.56.tar.gz`
+
+Copy the script to user bin
+`sudo cp -a sendEmail-v1.XX/sendEmail /usr/local/bin`
+
+Give execution permissions for that script
+`sudo chmod +x /usr/local/bin/sendEmail`
+
+Test it
+`sendEmail`
+
+5- Add to the Nagios Core resources the e-mail details `vi /usr/local/nagios/etc/resource.cfg`
+
+Append the following configuration:
+```bash
+# gmail account
+$USER5$=your_email@gmail.com
+$USER7$=smtp.gmail.com:587
+$USER9$=your_email@gmail.com
+$USER10$=your_password
+```
+
+6- Comment previous `notify-host-by-email` and `notify-service-by-email` commands and append the following ones:
+
+```bash
+define command{
+	command_name	notify-host-by-email
+	command_line	/usr/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n" | /usr/local/bin/sendEmail -s $USER7$ -xu $USER9$ -xp $USER10$ -t $USER5$ -f $USER5$ -o tls=yes -l /var/log/sendEmail -u "** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **" -m "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n"
+}
+ 
+define command{
+	command_name	notify-service-by-email
+	command_line	/usr/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$" | /usr/local/bin/sendEmail -s $USER7$ -xu $USER9$ -xp $USER10$ -t $CONTACTEMAIL$ -f $USER5$ -o tls=yes -l /var/log/sendEmail -u "** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **" -m "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$"
+}
+```
+
+7- Create a contact by appending this to contacts.cfg
+
+```bash
+define contact {
+        contact_name                            contact1
+        alias                                   YourName
+        email                                   your_email@gmail.com
+        service_notification_period             24x7
+        service_notification_options            w,u,c,r,f,s
+        service_notification_commands           notify-service-by-email
+        host_notification_period                24x7
+        host_notification_options               d,u,r,f,s
+        host_notification_commands              notify-host-by-email
+}
+```
+
+8- Append to the hosts and services block in the `vclones.cfg` file that you want to get notified to that contact
+```bash
+define service {
+        use                             local-service
+        host_name                       vclone1
+        service_description             HTTP-Tomcat-8080
+        check_command                   check_http_port
+        check_interval                  1
+        _port_number                    8080
+        contacts                        contact1         
+}
+```
+
+9- Restart nagios service.
+
+10- Try to put down tomcat service or manually issue a notification from the web nagios configuration panel.
