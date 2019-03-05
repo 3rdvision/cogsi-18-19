@@ -11,7 +11,33 @@ STUDENT **Daniel Azevedo** (1180109) - P1.1
 [//]: # (sudo systemctl restart nagios)
 [//]: # (-------------)
 
+---
+
 # Problem Analysis
+
+## Objective: To simulate a simple monitoring
+
+## Important concerns:
+
+### Remote Monitoring 
+
+* The monitoring of some properties (e.g., disk free space) may require the installation
+of software in the monitored machine
+
+* With Nagios one of the solutions for this issue is to use NRPE
+
+* The monitoring can be done by "pulling" or by "pushing". These may also be
+known as passive or active checks
+
+### Automatic Recovery
+
+* You should install Tomcat in the monitored machine
+* The Monitoring Server should try to automatically recover the Tomcat server when it is down. In Nagios, please refer to "event handlers" to support your solution
+* Contact(s) should be notified by email when the service changes states (e.g., up, down, etc,). In Nagios you may use the sendemail.
+
+### Customization
+
+* How the monitoring tool can be customized (e.g., using a different database, adding new features/plugins, setting different compiling options for optimization or security purposes, for instance, regarding NRPE)
 
 
 ---
