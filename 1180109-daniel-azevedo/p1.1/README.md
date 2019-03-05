@@ -18,6 +18,21 @@ STUDENT **Daniel Azevedo** (1180109) - P1.1
 # Solution design
 
 
+
+Monitoring of remote properties such as disk free space, cpu load, etc. will be done using NPRE.
+
+The NRPE addon consists of two pieces:
+
+* The check_nrpe plugin, which resides on the local monitoring machine
+* The NRPE daemon, which runs on the remote Linux/Unix machine
+
+When Nagios needs to monitor a resource of service from a remote Linux/Unix machine:
+
+* Nagios will execute the check_nrpe plugin and tell it what service needs to be checked
+* The check_nrpe plugin contacts the NRPE daemon on the remote host over an (optionally) SSL protected connection
+* The NRPE daemon runs the appropriate Nagios plugin to check the service or resource
+* The results from the service check are passed from the NRPE daemon back to the check_nrpe plugin, which then returns the check results to the Nagios process.
+
 ---
 # Steps to reproduce
 
@@ -95,7 +110,7 @@ WantedBy=multi-user.target
 
 7- In the host machine nagivate to http://nagios-vguest-ip:8080 and check if Tomcat9 welcome page comes up
 
-## Configure nagios to monitor the cloned machine Tomcat
+## Configure nagios to do remote monitoring of the cloned machine on Tomcat
 
 1- Create a new object file called vclones.cfg at `/usr/local/nagios/etc/objects/tutorial.cfg` with the following configuration (pay atention to CHANGE THIS):
 
@@ -289,3 +304,144 @@ define service {
 10- Restart nagios service.
 
 11- Try to put down tomcat service or manually issue a custom notification targeted to the HTTP-Tomcat service from the web nagios configuration panel.
+
+## Configure cloned machine to be monitored by properties (e.g. disk free space, current logged users, cpu load, etc.)
+
+### Configure NRPE agent on the guest (cloned) machine
+
+1- Defined a static ip address for the virtual machine by adding another network interface "host-only adapter" and define a static network adapter in virtualbox global tools. The first network interface to connect to the internet should be set as NAT.
+
+2- Configure netplan configuration yaml to be set as:
+
+/etc/netplan/01-netcfg.yaml
+```yaml
+network:
+    renderer: networkd
+    version: 2
+    ethernets:
+        enp0s3:
+            dhcp4: yes
+        enp0s8:
+            addresses: [192.168.99.101/24]
+            dhcp4: no
+            dhcp6: no
+            nameservers:
+                    addresses: [8.8.8.8,8.8.4.4]
+```
+
+and remove any other unwanted configuration files.
+
+4- Resconfigure netplan with `sudo netplan --debug apply`
+
+5- Install NRPE in the cloned virtual machine
+
+Run all below commands as root
+`sudo su`
+
+Download NRPE
+`wget http://assets.nagios.com/downloads/nagiosxi/agents/linux-nrpe-agent.tar.gz`
+
+Unpack and run the install script
+```bash
+tar xzf linux-nrpe-agent.tar.gz
+cd linux-nrpe-agent
+./fullinstall
+```
+
+6- When promt, insert the static ip address of the nagios manager machine.
+
+7- Uncomment and edit the sample nrpe commands `sudo vim /usr/local/nagios/etc/nrpe.cfg`
+
+
+Append the following command definitions:
+```bash
+command[check_users]=/usr/local/nagios/libexec/check_users -w $ARG1$ -c $ARG2$
+command[check_load]=/usr/local/nagios/libexec/check_load -w $ARG1$ -c $ARG2$
+command[check_disk]=/usr/local/nagios/libexec/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
+command[check_procs]=/usr/local/nagios/libexec/check_procs -w $ARG1$ -c $ARG2$ -s $ARG3$
+command[check_swap]=/usr/local/nagios/libexec/check_swap -w 20% -c 10%
+```
+
+### Install the NRPE pluggin on the host monitoring machine
+
+1- Download nrpe pluggin `wget https://github.com/NagiosEnterprises/nrpe/releases/download/nrpe-3.2.1/nrpe-3.2.1.tar.gz`
+
+2- Navigate to folder `cd nrpe-*/`
+
+3- Install the plugin
+
+Configure 
+`./configure`
+
+Compile check_nrpe
+`make check_nrpe`
+
+Install NRPE plugin
+`make install-plugin`
+
+4- Test the communication between monitoring machine -> virtual clone guest machine
+`/usr/local/nagios/libexec/check_nrpe -H 192.168.99.102`
+
+The output should be the NRPE version installed in the guest machine
+`NRPE v3.2.1`
+
+5- Add the command to check_nrpe to `commands.cfg` file
+
+```bash
+define command{
+	command_name 	check_nrpe
+	command_line 	$USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+}
+```
+
+6- Edit the monitoring property services to monitor the remote server using NRPE agent and with a check interval of 1 minute
+
+```bash
+define service {
+
+    use                     local-service           ; Name of service template to use
+    host_name               vclone1
+    check_interval          1
+    service_description     Current Load
+    check_command           check_nrpe!check_load -a 5.0,4.0,3.0 10.0,6.0,4.0
+}
+
+define service {
+
+    use                     local-service           ; Name of service template to use
+    host_name               vclone1
+    check_interval          1    
+    service_description     Total Processes
+    check_command           check_local_procs!250!400!RSZDT
+}
+
+define service {
+
+    use                     local-service           ; Name of service template to use
+    host_name               vclone1
+    check_interval          1    
+    service_description     Check Swap Guest
+    check_command           check_nrpe!check_swap
+}
+
+define service {
+
+    use                     local-service           ; Name of service template to use
+    host_name               vclone1
+    check_interval          1
+    service_description     Root Partition
+    check_command           check_nrpe!check_disk -a 20% 10% /
+}
+
+define service {
+
+    use                     local-service           ; Name of service template to use
+    host_name               vclone1
+    check_interval          1
+    service_description     Total Processes Guest
+    check_command           check_nrpe!check_procs -a 250 400 RSZDT
+}
+```
+
+7- Restart nagios.
+
