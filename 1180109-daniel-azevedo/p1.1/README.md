@@ -471,3 +471,116 @@ define service {
 
 7- Restart nagios.
 
+## Configure NAGIOS for automatic recovery of tomcat service
+
+1- In the cloned machine edit sudoers config file `sudo visudo`
+
+Append the following line
+```bash
+nagios ALL=(ALL) NOPASSWD: /usr/local/bin/restart_tomcat
+```
+
+2- Create the following scripts:
+
+/usr/local/bin/restart_tomcat
+```bash
+service restart tomcat
+```
+
+/usr/local/bin/restart_tomcat_now
+```bash
+sudo /usr/local/bin/restart_tomcat
+```
+
+3- Try to restart tomcat using nagios user `sudo su nagios` and then `restart_tomcat_now`
+
+4- Edit nrpe.cfg file and append the following line `command[restart_tomcat]=/usr/local/bin/restart_tomcat_now`
+
+5- Make sure global nagios configuration property `enable_event_handlers=1` is set to 1 in `nagios.cfg`
+
+6- Add the event_handler property to the target monitoring service 
+
+```bash
+event_handler_enabled           1
+event_handler                   restart-tomcat
+```
+
+7- Add the event_handler command `restart-tomcat` to magios:
+
+```bash
+define command{
+    command_name restart-tomcat
+    command_line    /usr/local/nagios/libexec/restart-tomcat  $SERVICESTATE$ $SERVICESTATETYPE$ $SERVICEATTEMPT$ $HOSTADDRESS$
+}
+```
+
+8- Create a restart-tomcat script in `/usr/local/nagios/libexec/` directory
+
+/usr/local/nagios/libexec/restart-tomcat
+```bash
+#!/bin/sh
+#
+# Event handler script for restarting the web server on the local machine
+#
+# Note: This script will only restart the web server if the service is
+#       retried 3 times (in a "soft" state) or if the web service somehow
+#       manages to fall into a "hard" error state.
+#
+
+case "$1" in
+OK)
+	# The service just came back up, so don't do anything...
+	;;
+WARNING)
+	# We don't really care about warning states, since the service is probably still running...
+	;;
+UNKNOWN)
+	# We don't know what might be causing an unknown error, so don't do anything...
+	;;
+CRITICAL)
+	# Aha!  The HTTP service appears to have a problem - perhaps we should restart the server...
+	# Is this a "soft" or a "hard" state?
+	case "$2" in
+
+	# We're in a "soft" state, meaning that Nagios is in the middle of retrying the
+	# check before it turns into a "hard" state and contacts get notified...
+	SOFT)
+
+		# What check attempt are we on?  We don't want to restart the web server on the first
+		# check, because it may just be a fluke!
+		case "$3" in
+
+		# Wait until the check has been tried 3 times before restarting the web server.
+		# If the check fails on the 4th time (after we restart the web server), the state
+		# type will turn to "hard" and contacts will be notified of the problem.
+		# Hopefully this will restart the web server successfully, so the 4th check will
+		# result in a "soft" recovery.  If that happens no one gets notified because we
+		# fixed the problem!
+		2)
+			echo -n "Restarting Tomcat service (3rd soft critical state)..."
+			# Call the init script to restart the HTTPD server
+			/usr/local/nagios/libexec/check_nrpe -H $4 -c restart_tomcat
+			;;
+			esac
+		;;
+
+	# The HTTP service somehow managed to turn into a hard error without getting fixed.
+	# It should have been restarted by the code above, but for some reason it didn't.
+	# Let's give it one last try, shall we?  
+	# Note: Contacts have already been notified of a problem with the service at this
+	# point (unless you disabled notifications for this service)
+	HARD)
+		echo -n "Restarting Tomcat service..."
+		# Call the init script to restart the HTTPD server
+		/usr/local/nagios/libexec/check_nrpe -H $4 -c restart_tomcat
+		;;
+	esac
+	;;
+esac
+exit 0
+
+```
+
+9- Give read and execution permissions `sudo chmod 744 /usr/local/nagios/libexec/restart-tomcat`
+
+10- Restart nagios and test the feature by stopping tomcat service in the cloned machine `sudo service tomcat stop` and wait 2 minutes until event handler sends a restart_tomcat command through NRPE and preventing the mail notification by successfully recovering from a SOFT state failure.
