@@ -13,13 +13,15 @@ STUDENT **Daniel Azevedo** (1180109) - P1.1
 
 ---
 
+![](https://i.imgur.com/7PBJ2np.png)
+
 # Problem Analysis
 
-## Objective: To simulate a simple monitoring
+## Objective
 
-## Important concerns:
+* To simulate a simple monitoring
 
-### Remote Monitoring 
+### 1- Remote Monitoring 
 
 * The monitoring of some properties (e.g., disk free space) may require the installation
 of software in the monitored machine
@@ -29,19 +31,19 @@ of software in the monitored machine
 * The monitoring can be done by "pulling" or by "pushing". These may also be
 known as passive or active checks
 
-### Automatic Recovery
+### 2- Automatic Recovery
 
 * You should install Tomcat in the monitored machine
 * The Monitoring Server should try to automatically recover the Tomcat server when it is down. In Nagios, please refer to "event handlers" to support your solution
 * Contact(s) should be notified by email when the service changes states (e.g., up, down, etc,). In Nagios you may use the sendemail.
 
-### Customization
+### 3- Customization
 
 * How the monitoring tool can be customized (e.g., using a different database, adding new features/plugins, setting different compiling options for optimization or security purposes, for instance, regarding NRPE)
 
-
 ---
-# Solution design
+
+# Solution design (Nagios)
 
 ## Overview of the design
 
@@ -71,7 +73,7 @@ Machine1 nagios was configured to monitor the following Machine2's services:
 * Root Partition Guest
 * SSH
 
-Notification was set for all of the previous services and an e-mail was sent to the defined contacts 24hx7.
+Notifications was set for all of the previous services and an e-mail was sent to the defined contacts 24hx7.
 
 Auto recovery for the HTTP-8080-Tomcat service was implemented in a way that every time the service changed state to CRITICAL and it would be the 2nd time, an intent to restart the tomcat server was sent through NRPE tunnel.
 Machine2 in receiving that intent, would run "sudo service  tomcat restart".
@@ -115,8 +117,9 @@ Each Addon should be installed in a particular way and most of them have instruc
 
 * When passing arguments through NRPE ($ARG1$) try avoiding the use of extensive arguments, in a case the monitoring machine gets compromised.
 
-`command_line $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
-`
+```bash
+command_line $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+```
 
 ### Different database
 
@@ -143,7 +146,6 @@ There are 3 major effects by enabling this tweak:
 
 3- Checks fork() Less - Normally Nagios will fork() twice when it executes host and service checks. This is done to (1) ensure a high level of resistance against plugins that go awry and segfault and (2) make the OS deal with cleaning up the grandchild process once it exits. The extra fork() is not really necessary, so it is skipped when you enable this option. As a result, Nagios will itself clean up child processes that exit (instead of leaving that job to the OS). This feature should result in significant load savings on your Nagios installation.
 
-
 * Using passive checks when possible.
 
 * Avoid using interpreted plugins (compiled C/C++, etc) or interpreted (like Pearl or Python) instead of shell scripts.
@@ -155,9 +157,53 @@ There are 3 major effects by enabling this tweak:
 Graphs like the one below will provide important statistics information for what can be tunned for a better performance.
 ![](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/images/mrtg-activehostchecks.png)
 
+---
 
+# Alternative comparison (Zhabix)
+
+## Zhabix Software Overview
+
+Zhabix is also an open-source monitoring software for diverse componentes such as networks, servers, virtual machines (VMs) and cloud services. 
+
+Zabbix provides monitoring metrics, among others network utilization, CPU load and disk space consumption. Zabbix monitoring configuration can be done using XML based templates which contains elements to monitor.
+
+Zabbix can use MySQL, MariaDB, PostgreSQL, SQLite, Oracle or IBM DB2 to store data. Its backend is written in C and the web frontend is written in PHP.
+
+## Key Features
+
+* High performance, high capacity (able to monitor hundreds of thousands of devices).
+* Auto-discovery of servers and network devices and interfaces.
+* Low-level discovery, allows to automatically start monitoring new items, file systems or network interfaces among others.
+* Distributed monitoring with centralized web administration.
+* Native high performance agents (client software for Linux, Solaris, HP-UX, AIX, FreeBSD, OpenBSD, OS X, Tru64/OSF1, Windows 2000, Windows Server 2003, Windows XP, Windows Vista, Windows Server 2008, Windows 7)
+* SLA, and ITIL KPI metrics on reporting.
+* High-level (business) view of monitored resources through user-defined visual console screens and dashboards.
+* Agent or Agent-less monitoring capabilities.
+* Web-based interface.
+* Support for both polling and trapping mechanisms.
+* JMX monitoring
+* Web monitoring
+* Flexible e-mail notification on predefined events.
+* Near-real-time notification mechanisms, for example using including XMPP protocol
+
+## Software architecture 
+
+Zhabix archicture and different communication mechanisms
+![](https://i.imgur.com/q3W0XAw.png)
+
+## Nagios Core vs Zhabix comparison
+
+According to alternativeto.net, Nagios and Zhabix are the two most popular monitoring systems softwares so it's important to compare them.
+Depending on the sysadmin priorities and personal taste, one software can be more intersting than the other.
+Below is a side-by-side comparison tabble that compares the key componentes of both monitoring solutions.
+
+![](https://i.imgur.com/TN8m1l3.png)
+![](https://i.imgur.com/g3uUf7m.png)
+
+source: https://www.comparitech.com/net-admin/nagios-vs-zabbix/#Dashboard_and_User_Interface
 
 ---
+
 # Steps to reproduce
 
 ## Installation and Execution Environments
@@ -682,3 +728,14 @@ exit 0
 9- Give read and execution permissions `sudo chmod 755 /usr/local/nagios/libexec/restart-tomcat`
 
 10- Restart nagios and test the feature by stopping tomcat service in the cloned machine `sudo service tomcat stop` and wait 2 minutes until event handler sends a restart_tomcat command through NRPE and preventing the mail notification by successfully recovering from a SOFT state failure.
+
+---
+
+# References:
+
+* https://pplware.sapo.pt/tutoriais/networking/tutorial-como-enviar-alertas-do-nagios-via-gmail/
+* https://medium.com/@exesse/how-to-build-ubuntu-server-in-virtualbox-on-host-only-network-adapter-with-internet-access-from-81cd7253e3b1
+* https://askubuntu.com/questions/984445/netplan-configuration-on-ubuntu-17-04-virtual-machine
+* https://www.comparitech.com/net-admin/nagios-vs-zabbix/#Dashboard_and_User_Interface
+* https://www.nagios.org/documentation/
+* https://www.zabbix.com/documentation/4.0/manual/introduction/overviewbb
