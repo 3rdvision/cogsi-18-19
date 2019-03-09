@@ -43,7 +43,42 @@ known as passive or active checks
 ---
 # Solution design
 
+## Overview of the design
 
+The solution was implemented and tested in a virtual environment of two remotelly connected machines using VirtualBox software.
+
+The machines in this virtual environment were configured with 2.5GB of RAM 10 GB of HDD and set to run Ubuntu 18.04 LTS.
+
+A virtualbox host-only ethernet adapter was set 192.168.99.1/8 and both machines had a NAT adapter and a host-only adapter attached to this virtual network.
+
+* Machine1 (nagios) - Monitoring machine running nagios
+* Machine2 (vclone1) - To be monitored with nagios agent (NRPE)
+
+In Machine1, nagios core was installed with pluggins along with all it's dependencies.
+
+Other scripts and nagios pluggins were also added in order to satisfy the requirements as detailed in the section "Steps to reproduce".
+
+In Machine2, a Tomcat 9 service was installed to run on port 8080.
+
+Machine1 nagios was configured to monitor the following Machine2's services:
+
+* Check Swap Guest
+* Current Load Guest
+* Current Users Guest
+* HTTP-80
+* HTTP-Tomcat-8080
+* PING
+* Root Partition Guest
+* SSH
+
+Notification was set for all of the previous services and an e-mail was sent to the defined contacts 24hx7.
+
+Auto recovery for the HTTP-8080-Tomcat service was implemented in a way that every time the service changed state to CRITICAL and it would be the 2nd time, an intent to restart the tomcat server was sent through NRPE tunnel.
+Machine2 in receiving that intent, would run "sudo service  tomcat restart".
+
+## Technical nagios deign aspects
+
+### Monitoring remote server properties through NRPE
 
 Monitoring of remote properties such as disk free space, cpu load, etc. will be done using NPRE.
 
@@ -52,12 +87,31 @@ The NRPE addon consists of two pieces:
 * The check_nrpe plugin, which resides on the local monitoring machine
 * The NRPE daemon, which runs on the remote Linux/Unix machine
 
+![](https://i.imgur.com/Ldtplu5.png)
+
 When Nagios needs to monitor a resource of service from a remote Linux/Unix machine:
 
 * Nagios will execute the check_nrpe plugin and tell it what service needs to be checked
 * The check_nrpe plugin contacts the NRPE daemon on the remote host over an (optionally) SSL protected connection
 * The NRPE daemon runs the appropriate Nagios plugin to check the service or resource
 * The results from the service check are passed from the NRPE daemon back to the check_nrpe plugin, which then returns the check results to the Nagios process.
+
+## Customization of Nagios & Other important notes
+
+### Apearance
+
+There is a possibility to change nagio's frontends web appearance, the look and feel of the Nagios Core CGIs by installing the different themes, web interfaces and even enabling responsive designs for mobile web browsing using different online theme solutions.
+
+Among other different sources of themes:
+
+* The official nagios website: https://exchange.nagios.org/directory/Addons/Frontends-(GUIs-and-CLIs)
+
+Theme example:
+![](https://exchange.nagios.org/components/com_mtree/img/listings/m/605.png)
+
+### Security
+
+* When passing arguments through NRPE try to avoid the use of extensive arguments in a case the monitoring machine gets compromised.
 
 ---
 # Steps to reproduce
@@ -581,6 +635,6 @@ exit 0
 
 ```
 
-9- Give read and execution permissions `sudo chmod 744 /usr/local/nagios/libexec/restart-tomcat`
+9- Give read and execution permissions `sudo chmod 755 /usr/local/nagios/libexec/restart-tomcat`
 
 10- Restart nagios and test the feature by stopping tomcat service in the cloned machine `sudo service tomcat stop` and wait 2 minutes until event handler sends a restart_tomcat command through NRPE and preventing the mail notification by successfully recovering from a SOFT state failure.
