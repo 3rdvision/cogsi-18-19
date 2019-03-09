@@ -98,7 +98,7 @@ When Nagios needs to monitor a resource of service from a remote Linux/Unix mach
 
 ## Customization of Nagios & Other important notes
 
-### Apearance
+### Apearance and custom interfaces
 
 There is a possibility to change nagio's frontends web appearance, the look and feel of the Nagios Core CGIs by installing the different themes, web interfaces and even enabling responsive designs for mobile web browsing using different online theme solutions.
 
@@ -109,9 +109,53 @@ Among other different sources of themes:
 Theme example:
 ![](https://exchange.nagios.org/components/com_mtree/img/listings/m/605.png)
 
-### Security
+Each Addon should be installed in a particular way and most of them have instructions on nagios webpage, a link to an external documentation or the installation steps in the README.
 
-* When passing arguments through NRPE try to avoid the use of extensive arguments in a case the monitoring machine gets compromised.
+### Security and NRPE
+
+* When passing arguments through NRPE ($ARG1$) try avoiding the use of extensive arguments, in a case the monitoring machine gets compromised.
+
+`command_line $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+`
+
+### Different database
+
+Nagios Core doesn't run a database. On the other hand, nagios XL, the premium paid version of nagios, allows the customization of the database and even offloading mysql to a remote server.
+
+The configuration of the type of database should be in a file `/usr/local/nagiosxi/html/config.inc.php` where it's stated in a line the dbtype: `"dbtype" => 'mysql'`.
+
+To adjust Nagios XL server settings to use an external database we must edit 3 confioiguration files: `ndo2db.cfg` `config.inc.php` and `settings.php`. Also it's important to modify the backup script, located by default in `/root/scripts/automysqlbackup`and changing `DBHOST=localhost` to `DBHOST=<IP_OF_MYSQL_OR MARIADB_SERVER>`.
+
+### Performance Tweaks
+
+* Large installation tweak options
+
+This option determines whether or not the Nagios daemon will take several shortcuts to improve performance. These shortcuts result in the loss of a few features, but larger installations will likely see a lot of benefit from doing so.
+
+To enable it, edit nagios config file and enable the option 
+`use_large_installation_tweaks=1`
+
+There are 3 major effects by enabling this tweak:
+
+1- No Summary Macros In Environment Variables - The summary macros will not be available to you as environment variables. Calculating the values of these macros can be quite time-intensive in large configurations, so they are not available as environment variables when use this option. Summary macros will still be available as regular macros if you pass them to to your scripts as arguments.
+
+2- Different Memory Cleanup - Normally Nagios will free all allocated memory in child processes before they exit. This is probably best practice, but is likely unnecessary in most installations, as most OSes will take care of freeing allocated memory when processes exit. The OS tends to free allocated memory faster than can be done within Nagios itself, so Nagios won't attempt to free memory in child processes if you enable this option.
+
+3- Checks fork() Less - Normally Nagios will fork() twice when it executes host and service checks. This is done to (1) ensure a high level of resistance against plugins that go awry and segfault and (2) make the OS deal with cleaning up the grandchild process once it exits. The extra fork() is not really necessary, so it is skipped when you enable this option. As a result, Nagios will itself clean up child processes that exit (instead of leaving that job to the OS). This feature should result in significant load savings on your Nagios installation.
+
+
+* Using passive checks when possible.
+
+* Avoid using interpreted plugins (compiled C/C++, etc) or interpreted (like Pearl or Python) instead of shell scripts.
+
+* Disabling the option to use agressive host checking in the host checking options `use_aggressive_host_checking=0`
+
+* Using nagiostats utility to allow to graph various Nagios performance statistics over time using MRTG
+
+Graphs like the one below will provide important statistics information for what can be tunned for a better performance.
+![](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/images/mrtg-activehostchecks.png)
+
+
 
 ---
 # Steps to reproduce
