@@ -756,7 +756,7 @@ exit 0
 
 4- Install nagios pluggins 2.2.1 (refer to doc) and it's package requirements: `sudo apt install autoconf gcc libc6 libmcrypt-dev makelibssl-dev wget bc gawk dc build-essential snmp libnet-snmp-perlgettext`
 
-## Zabbix installation
+## Zabbix Server installation
 
 1- Install apache2
 
@@ -884,7 +884,50 @@ UPDATE users SET passwd=md5('your_password_here') WHERE alias='Admin';
 
 Finally login using the credentials: Admin/your_password_here.
 
+### Zabbix Agent installation
+
+1- Install Zabbix agent
+
+Instal zabbix agent
+```bash
+sudo apt-get update
+sudo apt-get install zabbix-agent
+```
+
+2- Configure Zabbix agent `sudo vim /etc/zabbix/zabbix_agentd.conf` and change the lines:
+
+```bash
+Server=192.168.99.103
+ServerActive=http://192.168.99.103/zabbix/
+Hostname=zabbix-serv1
+```
+
+3- Enable and restart Zabbix agent 
+
+```bash
+sudo systemctl enable zabbix-agent
+sudo systemctl restart zabbix-agent
+```
+
 ---
+
+### Add a Zabbix host
+
+1- Login to zabbix web interface at http://zabbix-serv-ip/zabbix/
+
+2- Go to Configuration > Hosts > Create Host
+
+3- Fill the form with host name, your vclone ip address in Agent Interfaces and add it to Linux Servers group
+
+4- Go to templates tab, click select Template OS Linux, click select and underlined Add button then the square blue Add button.
+
+### Monitor Graphs 
+
+1- Go to Monitoring > Graphs
+
+2- In the Graph dropdown select "CPU load", in the Host dropdown select "vclone1" or the name that you choose for your monitored host.
+
+3- Select the desired interval and the graph will instantly adapt to your preferences
 
 # References:
 
@@ -894,3 +937,6 @@ Finally login using the credentials: Admin/your_password_here.
 * https://www.comparitech.com/net-admin/nagios-vs-zabbix/#Dashboard_and_User_Interface
 * https://www.nagios.org/documentation/
 * https://www.zabbix.com/documentation/4.0/manual/introduction/overviewbb
+* https://websiteforstudents.com/how-to-install-zabbix-4-0-monitoring-system-with-apache2-mariadb-and-php-7-2-on-ubuntu-16-04-18-04-18-10/
+* https://tecadmin.net/install-zabbix-agent-on-ubuntu-and-debian/
+* https://tecadmin.net/add-host-zabbix-server-monitor/
