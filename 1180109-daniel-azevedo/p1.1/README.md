@@ -115,7 +115,19 @@ Each Addon should be installed in a particular way and most of them have instruc
 
 ### Security and NRPE
 
+#### Good security pracices:
+
 * When passing arguments through NRPE ($ARG1$) try avoiding the use of extensive arguments, in a case the monitoring machine gets compromised.
+
+* Don't Run Nagios As Root
+
+* Lock Down The Check Result Directory. Make sure that only the nagios user is able to read/write in the check result path.
+
+* Require Authentication In The CGIs
+
+* Secure Access to Remote Agents. Make sure you lock down access to agents (NRPE, NSClient, SNMP, etc.) on remote systems using firewalls, access lists, etc. You don't want everyone to be able to query your systems for status information.
+
+* Secure Communication Channels. Make sure you encrypt communication channels between different Nagios installations and between your Nagios servers and your monitoring agents whenever possible.
 
 ```bash
 command_line $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
@@ -159,11 +171,11 @@ Graphs like the one below will provide important statistics information for what
 
 ---
 
-# Alternative comparison (Zhabix)
+# Alternative comparison (Zabbix)
 
-## Zhabix Software Overview
+## Zabbix Software Overview
 
-Zhabix is also an open-source monitoring software for diverse componentes such as networks, servers, virtual machines (VMs) and cloud services. 
+Zabbix is also an open-source monitoring software for diverse componentes such as networks, servers, virtual machines (VMs) and cloud services. 
 
 Zabbix provides monitoring metrics, among others network utilization, CPU load and disk space consumption. Zabbix monitoring configuration can be done using XML based templates which contains elements to monitor.
 
@@ -188,12 +200,12 @@ Zabbix can use MySQL, MariaDB, PostgreSQL, SQLite, Oracle or IBM DB2 to store da
 
 ## Software architecture 
 
-Zhabix archicture and different communication mechanisms
+Zabbix archicture and different communication mechanisms
 ![](https://i.imgur.com/q3W0XAw.png)
 
-## Nagios Core vs Zhabix comparison
+## Nagios Core vs Zabbix comparison
 
-According to alternativeto.net, Nagios and Zhabix are the two most popular monitoring systems softwares so it's important to compare them.
+According to alternativeto.net, Nagios and Zabbix are the two most popular monitoring systems softwares so it's important to compare them.
 Depending on the sysadmin priorities and personal taste, one software can be more intersting than the other.
 Below is a side-by-side comparison tabble that compares the key componentes of both monitoring solutions.
 
@@ -204,7 +216,7 @@ source: https://www.comparitech.com/net-admin/nagios-vs-zabbix/#Dashboard_and_Us
 
 ---
 
-# Steps to reproduce
+# Steps to reproduce (Nagios)
 
 ## Installation and Execution Environments
 
@@ -728,6 +740,149 @@ exit 0
 9- Give read and execution permissions `sudo chmod 755 /usr/local/nagios/libexec/restart-tomcat`
 
 10- Restart nagios and test the feature by stopping tomcat service in the cloned machine `sudo service tomcat stop` and wait 2 minutes until event handler sends a restart_tomcat command through NRPE and preventing the mail notification by successfully recovering from a SOFT state failure.
+
+---
+
+
+# Steps to reproduce (Zabbix)
+
+## Installation and Execution Environments
+
+1- Inside a virtual machine guest with 2 GB RAM and 10 GB disk Install Ubuntu Server 18.04 LTS
+
+2- Clone the machine created at step 1 to later use as hosts of nagios.
+
+3- Install nagios core 4 on machine created on step 1 and all it's dependencies (refer to nagios 4.0 documentation)
+
+4- Install nagios pluggins 2.2.1 (refer to doc) and it's package requirements: `sudo apt install autoconf gcc libc6 libmcrypt-dev makelibssl-dev wget bc gawk dc build-essential snmp libnet-snmp-perlgettext`
+
+## Zabbix installation
+
+1- Install apache2
+
+```bash
+sudo apt update
+sudo apt install apache2
+```
+
+2- Test if apache is operational at http://vhost-ip-address
+
+3- Install MariaDB Database Server `sudo apt-get install mariadb-server mariadb-client`
+
+4- Verify mariadb server is running `sudo systemctl status mariadb.service`
+
+5- Secure MariaDB server by creating a root password and disallowing remote root access `sudo mysql_secure_installation`
+
+6- Open MariaDB config file `sudo vim /etc/mysql/mariadb.conf.d/50-server.cnf` and append the lines below
+```bash
+innodb_file_format = Barracuda
+innodb_large_prefix = 1
+innodb_default_row_format = dynamic
+```
+
+7- Restart MariaDB `sudo systemctl restart mariadb.service`
+
+8- Test if you can login to MariaDB with `sudo mysql -u root -p`
+
+9- Install PHP 7.2 and Related Modules
+
+Add the following third party repositories:
+```bash
+sudo apt-get install software-properties-common
+sudo add-apt-repository ppa:ondrej/php
+```
+
+Update the repository list
+`sudo apt update`
+
+Install PHP7.2 packages and it's dependencies and related modules
+`sudo apt install php7.2 libapache2-mod-php7.2 php7.2-common php7.2-mysql php7.2-gmp php7.2-curl php7.2-intl php7.2-mbstring php7.2-xmlrpc php7.2-mysql php7.2-gd php7.2-xml php7.2-cli php7.2-zip`
+
+Change the PHP7.2 apache config file `sudo vim /etc/php/7.2/apache2/php.ini` and make the below changes:
+
+```bash
+file_uploads = On
+allow_url_fopen = On
+short_open_tag = On
+memory_limit = 256M
+upload_max_filesize = 100M
+max_execution_time = 360
+date.timezone = Europe/Lisbon
+``` 
+
+Restart apache2 service `sudo systemctl restart apache2.service`
+
+Test php by creating a file `sudo vim /var/www/html/phpinfo.php` and add to this file content:
+
+```php
+<?php phpinfo( ); ?>
+```
+
+Navigate to http://vhost-ip-address/phpinfo.php
+
+10- Create Zabbix database `sudo mysql -u root -p` then type in mariadb console:
+
+```SQL
+CREATE DATABASE zabbix character set utf8 collate utf8_bin;
+CREATE USER 'zabbixuser'@'localhost' IDENTIFIED BY 'new_password_here';
+GRANT ALL ON zabbix.* TO 'zabbixuser'@'localhost' IDENTIFIED BY 'user_password_here' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+11- Install Zabbix 
+
+Add Zabbix 4.0 repositories
+```bash
+cd /tmp
+wget https://repo.zabbix.com/zabbix/4.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_4.0-2+bionic_all.deb
+wget https://repo.zabbix.com/zabbix/4.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_4.0-2+xenial_all.deb
+wget https://repo.zabbix.com/zabbix/4.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_4.0-2+bionic_all.deb
+sudo dpkg -i zabbix-release_4.0-2+bionic_all.deb
+sudo dpkg -i zabbix-release_4.0-2+bionic*.deb
+sudo dpkg -i zabbix-release_4.0-2+xenial*.deb
+```
+
+Install the other Zabbix dependencies:
+`sudo apt install zabbix-server-mysql zabbix-agent zabbix-frontend-php php7.2-bcmath php7.2-ldap`
+
+
+12- Configure Zabbix
+
+Open Zabbix config file
+`sudo vim /etc/zabbix/zabbix_server.conf`
+
+Make the following changes:
+```bash
+DBName=zabbix
+DBUser=zabbixuser
+DBPassword=zabbixuser_password_here
+```
+
+Change the hostname of zabbix server
+`sudo nano /etc/zabbix/zabbix_agentd.conf`
+and change the line:
+`Hostname=zabbix.example.com`
+
+Import the initial schema and data for the server with MySQL:
+`zcat /usr/share/doc/zabbix-server-mysql/create.sql.gz | mysql -u zabbixuser -p zabbix`
+
+Restart and enable the Zabbix service:
+```bash
+sudo systemctl restart zabbix-server
+sudo systemctl enable zabbix-server
+sudo systemctl restart apache2.service
+```
+
+Navigate to http://vhost-ip-address/zabbix and follow the instructions inserting the previous MySQL credentials.
+
+Set the Admin credentials with ``sudo mysql -u root -p`` followed by:
+```SQL
+USE zabbix;
+UPDATE users SET passwd=md5('your_password_here') WHERE alias='Admin';
+```
+
+Finally login using the credentials: Admin/your_password_here.
 
 ---
 
