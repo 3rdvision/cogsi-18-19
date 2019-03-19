@@ -1,0 +1,13 @@
+#!/bin/bash
+
+
+if [ $# -eq 0 ]
+  then
+    echo "No arguments supplied"
+  else
+    echo "Doing check on hostname: $1"
+fi
+
+
+cd /home/dan/todd-cogsi/build/classes/main
+java net.jnjmx.todd.ClientApp $1
