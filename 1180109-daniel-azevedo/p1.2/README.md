@@ -247,3 +247,28 @@ define service {
 11- Restart nagios `sudo systemctl restart nagios.service` and go to nagios main page `http://nagios-ip/nagios/`
 
 12- Test if the service is up when todd server is up and if it becomes critical when it is killed.
+
+## Configure nagios to receive passive NSCA notifications (push notifications)
+
+1- Install nsca for ubuntu 18.04 LTS `apt install nsca` in nagios host (compiling from source using tar package from nagios documentation doesn't work as NSCA is mostly depricated, unmaintained and the make install won't work on Ubuntun 18.04)
+
+2- Configure NSCA config file `sudo vim /etc/nsca.cfg` and change the following atributes:
+
+```bash
+server_address=192.168.99.101 # <-- your nagios ip address
+
+debug=1
+
+command_file=/usr/local/nagios/var/rw/nagios.cmd
+
+alternate_dump_file=/usr/local/nagios/var/rw/nsca.dump
+
+```
+
+3- Start NSCA service if it's not already running to apply the new settings `sudo service nsca restart`
+
+4- Also install nsca package `apt install nsca` (in this step we only really need the nsca_client but due to Ubuntu 18.04 client being uncompatible with nsca server version, it will be necessary to make this)
+
+5- Try to send a test command to confirm it is working `send_nsca -H <nagios-ip-address> < test`
+
+6- Check the syslog in nagios machine and confirm it received something `tail -f /var/log/syslog`
