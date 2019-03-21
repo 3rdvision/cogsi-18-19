@@ -20,6 +20,10 @@ STUDENT **Daniel Azevedo** (1180109) - P1.1
 
 * Extend the scenario developed for P1.1 with application monitoring using JMX.
 
+## Requirements:
+
+
+
 # Solution Design
 
 
@@ -272,3 +276,106 @@ alternate_dump_file=/usr/local/nagios/var/rw/nsca.dump
 5- Try to send a test command to confirm it is working `send_nsca -H <nagios-ip-address> < test`
 
 6- Check the syslog in nagios machine and confirm it received something `tail -f /var/log/syslog`
+
+## Configure nagios to do event handling by growing size of todd
+
+1- Append the following command to nagios `sudo vim /usr/local/nagios/etc/objects/commands.cfg`
+
+```bash
+### Grow todd size
+
+define command{
+    command_name grow_todd
+    command_line    /usr/local/nagios/libexec/grow_todd  $SERVICESTATE$ $SERVICESTATETYPE$ $SERVICEATTEMPT$ $HOSTADDRESS$ $_SERVICEGROW_NUMBER$
+}
+```
+
+2- Create the following script in libexec `sudo vim /usr/local/nagios/libexec/grow_todd`
+
+```bash
+#!/bin/sh
+#
+# Event handler script for restarting the web server on the local machine
+#
+# Note: This script will only restart the web server if the service is
+#       retried 3 times (in a "soft" state) or if the web service somehow
+#       manages to fall into a "hard" error state.
+#
+
+# What state is the HTTP service in?
+
+echo "Variables todd: 1: $1 2: $2 3: $3 4: $4 5: $5 and... over." >> /home/nagios/log  
+
+case "$1" in
+OK)
+	# The service just came back up, so don't do anything...
+	;;
+WARNING)
+	# We don't really care about warning states, since the service is probably still running...
+	;;
+UNKNOWN)
+	# We don't know what might be causing an unknown error, so don't do anything...
+	;;
+CRITICAL)
+	# Aha!  The HTTP service appears to have a problem - perhaps we should restart the server...
+	# Is this a "soft" or a "hard" state?
+	case "$2" in
+
+	# We're in a "soft" state, meaning that Nagios is in the middle of retrying the
+	# check before it turns into a "hard" state and contacts get notified...
+	SOFT)
+
+		# What check attempt are we on?  We don't want to restart the web server on the first
+		# check, because it may just be a fluke!
+
+		# Wait until the check has been tried 3 times before restarting the web server.
+		# If the check fails on the 4th time (after we restart the web server), the state
+		# type will turn to "hard" and contacts will be notified of the problem.
+		# Hopefully this will restart the web server successfully, so the 4th check will
+		# result in a "soft" recovery.  If that happens no one gets notified because we
+		# fixed the problem!
+		echo -n "Growing todd size soft..."
+		echo "Now executing grow_todd from SOFT state" >> /home/nagios/log  		
+		# Call the init script to restart the HTTPD server
+		cd /home/dan/todd-cogsi/build/classes/main
+		java net.jnjmx.todd.ClientApp4 ${4}:6002 $5 >> /home/nagios/log  
+		;;
+
+	# The HTTP service somehow managed to turn into a hard error without getting fixed.
+	# It should have been restarted by the code above, but for some reason it didn't.
+	# Let's give it one last try, shall we?  
+	# Note: Contacts have already been notified of a problem with the service at this
+	# point (unless you disabled notifications for this service)
+	HARD)
+		echo -n "Growing todd size hard..."
+		echo "Now executing grow_todd from HARD state" >> /home/nagios/log  		
+		# Call the init script to restart the HTTPD server
+		cd /home/dan/todd-cogsi/build/classes/main
+		java net.jnjmx.todd.ClientApp4 ${4}:6002 $5 >> /home/nagios/log  
+		;;
+	esac
+	;;
+esac
+exit 0
+
+
+```
+
+3- Give run and read permissions to that script `sudo chmod +rx /usr/local/nagios/libexec/grow_todd`
+
+4- Add event handler property to todd's passive service by appending the following lines:
+
+```bash
+define service{
+        use                             passive-service
+        host_name                       vclone1        
+        service_description             todd-passive-up
+        max_check_attempts              1
+        event_handler_enabled           1
+        event_handler                   grow_todd        
+        _grow_number                    12        
+}
+```
+5- Check configuration for errors `sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg`
+
+6- If everything is good, restart nagios `sudo systemctl restart nagios.service`
