@@ -1,4 +1,4 @@
-STUDENT **Daniel Azevedo** (1180109) - P1.1
+STUDENT **Daniel Azevedo** (1180109) - P1.2
 ===============================
 
 [//]: # (NAGIOS TOOLS)
@@ -13,6 +13,9 @@ STUDENT **Daniel Azevedo** (1180109) - P1.1
 
 ---
 
+![](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/11/DevOps-Life-Cyce-Nagios-Tutorial-Edureka.png)
+
+---
 
 # Problem Analysis
 
@@ -22,29 +25,83 @@ STUDENT **Daniel Azevedo** (1180109) - P1.1
 
 ## Requirements:
 
+### Integration with Nagios:
 
+* Check (polling) if TODD server is running. If TODD server is not running you should
+try to automatically start it
+
+* Check (polling) if the "AvailableSessions" attribute is below 20% of the "Size"
+attribute. If so you should consider that the service is critical and notify someone.
+
+### JMX Notifications
+
+* You should develop a JMX Agent Application that is able to use JMX notifications
+to react to "events" in a JMX monitored resource.
+
+* Using JMX notifications this application should be able to monitor the TODD server
+and increase the size of the "SessionPool" by using the method "grow" when the
+"AvailableSessions" attribute is below 20% of the "Size" attribute. You should try
+to integrate with the system monitoring tools using passive checks.
+
+* You should also use a similar approach to handle possible JVM memory limitations
+regarding the Tomcat server. You should define thresholds for this concern and try
+to free memory or even restart tomcat if necessary (with different settings for the
+memory usage of the JVM).
+
+---
 
 # Solution Design
 
+A customized version of TODD (Time Of Day Deamon):
 
+* Public repository: https://bitbucket.org/dvazevedo/todd-cogsi/src/master/
 
+In this solution, two virtual machines were used:
+
+* Ubuntu 18.04 LTS server with 2GB RAM, 10 GB HDD, Nagios-core installed server with nagios pluggins package, gradle, openjdk-8-headless, nsca and TODD from above repository.
+
+* Ubuntu 18.04 LTS server with 2GB RAM, 10 GB HDD, Nagios agent installed with nagios pluggins package, gradle, openjdk-8-headless, nsca and TODD from above repository.
+
+Overview:
+
+The solution takes advantage of the NSCA passive notification plugin on nagios
+
+![](https://i.imgur.com/G5IHnaI.png)
+
+In this case, the external application will be the Java client that will be monitoring TODD or Tomcat through JMX
+
+The JMX architecture should be simply put in the below image:
+
+![](https://upload.wikimedia.org/wikipedia/en/thumb/d/db/Jmxarchitecture.png/400px-Jmxarchitecture.png)
+
+In the below steps to reproduce there are more details and explanantions about the procedure but in an overall matter it consists of the following key points:
+
+* Define an active nagios check that uses java executable that will return either 0 or 2 code whenether TODD is running on the remote machine
+
+* Define an active nagios check that uses java executable that will return either 0 or 2 code whenether TODD load is > 20%
+
+* An event listener with a gauge for high and low <20%/>20% for the load of Available Sessions / Size in terms of the property SessionsPool. This gauge will trigger and send a notification that will be handled in a behavior explained in the next point.
+
+* A notification receiver server running on remote machine that will get notified when the load is >20% and will react by sending a send_nsca command to the nagios machine with the status of the load.
+
+---
 
 # Steps to reproduce
 
-## Configure todd active pulling checks for Todd up and Todd load percentage
+## Configure TODD active pulling checks for TODD up and TODD load percentage
 
 0 - Install all dependencies:
 
 * gradle
 * openjdk-8-jdk-headless
 
-1- Go to nagios machine and clone the modified version of Todd - to accept JMX remote connections and return exit codes 0 or 2 in case Todd is not running or the sessions load is higher than 20%
+1- Go to nagios machine and clone the modified version of TODD - to accept JMX remote connections and return exit codes 0 or 2 in case TODD is not running or the sessions load is higher than 20%
 `cd ~`
 `git clone https://bitbucket.org/dvazevedo/todd-cogsi/src/master/`
 
 2- Do step 1 in the monitoring machine
 
-3- In the monitoring machine run Todd server and change the ip address of that same machine to match your own vhost ip machine:
+3- In the monitoring machine run TODD server and change the ip address of that same machine to match your own vhost ip machine:
 
 `vim build.gradle`
 
@@ -127,7 +184,7 @@ task runClient3(type:JavaExec, dependsOn: classes) {
 
 `gradle runServerRemote`
 
-4- Test if nagios machine can connect to the machine running Todd server
+4- Test if nagios machine can connect to the machine running TODD server
 
 `gradle runClient`
 
@@ -135,7 +192,7 @@ task runClient3(type:JavaExec, dependsOn: classes) {
 
 `gradle runClient3`
 
-5- Kill the Todd server in the vhost being monitored and test again if the return code is 2
+5- Kill the TODD server in the vhost being monitored and test again if the return code is 2
 
 `gradle runClient`
 
@@ -165,7 +222,7 @@ cd /home/dan/todd-cogsi/build/classes/main
 java net.jnjmx.todd.ClientApp $1
 ```
 
-* this will do the same as gradle runClient but it will accept an argument ($1) which will be vhost todd server ip address.
+* this will do the same as gradle runClient but it will accept an argument ($1) which will be vhost TODD server ip address.
 
 7-  Create nagios plugin script to use as the check load command:
 
@@ -188,7 +245,7 @@ cd /home/dan/todd-cogsi/build/classes/main
 java net.jnjmx.todd.ClientApp2 $1:6002
 ```
 
-* this will do the same as gradle runClient2 but it will accept an argument ($1) which will be vhost todd server ip address and add to it the port 6002 which is the port todd is running on.
+* this will do the same as gradle runClient2 but it will accept an argument ($1) which will be vhost TODD server ip address and add to it the port 6002 which is the port todd is running on.
 
 8- Add the command to nagios configuration
 
@@ -211,7 +268,7 @@ define command{
 }
 ```
 
-9- Define the services in Todd vhost
+9- Define the services in TODD vhost
 
 `sudo vim /usr/local/nagios/etc/objects/vclones.cfg`
 
@@ -250,7 +307,7 @@ define service {
 
 11- Restart nagios `sudo systemctl restart nagios.service` and go to nagios main page `http://nagios-ip/nagios/`
 
-12- Test if the service is up when todd server is up and if it becomes critical when it is killed.
+12- Test if the service is up when TODD server is up and if it becomes critical when it is killed.
 
 ## Configure nagios to receive passive NSCA notifications (push notifications)
 
@@ -277,7 +334,7 @@ alternate_dump_file=/usr/local/nagios/var/rw/nsca.dump
 
 6- Check the syslog in nagios machine and confirm it received something `tail -f /var/log/syslog`
 
-## Configure nagios to do event handling by growing size of todd
+## Configure nagios to do event handling by growing size of TODD
 
 1- Append the following command to nagios `sudo vim /usr/local/nagios/etc/objects/commands.cfg`
 
@@ -363,7 +420,7 @@ exit 0
 
 3- Give run and read permissions to that script `sudo chmod +rx /usr/local/nagios/libexec/grow_todd`
 
-4- Add event handler property to todd's passive service by appending the following lines:
+4- Add event handler property to TODD's passive service by appending the following lines:
 
 ```bash
 define service{
