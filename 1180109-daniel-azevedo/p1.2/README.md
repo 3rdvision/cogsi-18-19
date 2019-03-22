@@ -436,3 +436,26 @@ define service{
 5- Check configuration for errors `sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg`
 
 6- If everything is good, restart nagios `sudo systemctl restart nagios.service`
+
+## Configure the remote host to receive JMX notifications when threshold is under 20% of resources and warn nagios host through send_nsca
+
+1- Clone the custom repository of TODD `git clone https://dvazevedo@bitbucket.org/mei-isep/todd.git`
+
+2- Start TODD server and TODD notification receiver/handler
+
+`gradle runServerRemote`
+
+`gradle runClient3`
+
+Client 3 will add a notifiction event listener to the remote server that will trigger a notification whenether the free resources are under 20% and afterwards when they return back to normal state >20%.
+
+The notification trigger will also create a file in /tmp/test with contents that will be automatically used in the command `send_nsca -H <nagios-ip> < /tmp/test`
+
+The content of /tmp/test will have the nagios remote host name, the service name, the return code (0 if OK or 2 if OVERLOAD) and a custom message.
+
+Each time there is an overload or recovery, ClientApp3 will automatically trigger everything to notify nagios of the sittuation which may itself do an event handle to grow those resources and get things back to normal.
+
+To test this feature `gradle runClient5` should be used in order to create 6 dummies for 10 seconds that will fill 6 sessions and surpass the 20% for the default amount of AvailableSessions (8 Sessions).
+
+** All the implemented JMX code is commented and documented so please check the src for the custom TODD repository as stated in the beggining of this README. **
+
