@@ -58,6 +58,7 @@ public class Client {
 		if (response == null) {
 			socket.close();
 			//throw new IOException("TODD timeOfDay failed");
+			System.err.println("time of day response was null :(");
 			System.exit(2);
 		}
 

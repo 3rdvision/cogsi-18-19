@@ -30,7 +30,7 @@ public class ClientApp3 {
 	 * gauge monitor.
 	 */
 	public static void configureMonitor1(MBeanServerConnection mbs) throws Exception {
-		ObjectName spmon = new ObjectName("todd:id=SessionPoolMonitorRemote");
+		ObjectName spmon = new ObjectName("todd:id=PercentageOfResource");
 
 		Set<ObjectInstance> mbeans = mbs.queryMBeans(spmon, null);
 
@@ -40,16 +40,24 @@ public class ClientApp3 {
 			// noting to do...
 		}
 
+		System.out.println("going for the attribute list");
+
 		AttributeList spmal = new AttributeList();
-		spmal.add(new Attribute("ObservedObject", new ObjectName("todd:id=Server")));
-		spmal.add(new Attribute("ObservedAttribute", "Connections"));
-		spmal.add(new Attribute("GranularityPeriod", new Long(10000)));
+		spmal.add(new Attribute("ObservedObject", new ObjectName("todd:id=SessionPool")));
+		spmal.add(new Attribute("ObservedAttribute", "ResourceFreePercentage"));
+		spmal.add(new Attribute("GranularityPeriod", new Long(1000)));
 		spmal.add(new Attribute("NotifyHigh", new Boolean(true)));
 		spmal.add(new Attribute("NotifyLow", new Boolean(true)));
 		mbs.setAttributes(spmon, spmal);
 
-		mbs.invoke(spmon, "setThresholds", new Object[] { new Integer(2), new Integer(0) },
+		System.out.println("invoking notification");
+
+
+		mbs.invoke(spmon, "setThresholds", new Object[] { new Double(100), new Double(20) },
 				new String[] { "java.lang.Number", "java.lang.Number" });
+
+		System.out.println("invoked notification");
+
 
 		mbs.addNotificationListener(spmon, new JMXNotificationListener(), null, null);
 
@@ -111,14 +119,14 @@ public class ClientApp3 {
 			// Set a Notification Handler
 			configureMonitor1(mbs);
 			
-			configureMonitor2(mbs);
+			//configureMonitor2(mbs);
 			
 			// mbs.addNotificationListener(new ObjectName("todd:id=SessionPool"), new
 			// JMXNotificationListener(), null, null);
 			// Thread.sleep(100000);
 			
-			System.out.println("Waiting 60 secs to receive notifications");
-			Thread.sleep(60000);
+			System.out.println("Waiting 292 billion years to receive notifications");
+			Thread.sleep(Long.MAX_VALUE);
 			
 			c.close();
 		} catch (Exception ex) {

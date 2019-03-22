@@ -5,4 +5,5 @@ public interface SessionPoolMBean {
 	
 	Integer getAvailableSessions();
 	Integer getSize();
+	double getResourceFreePercentage();	
 }

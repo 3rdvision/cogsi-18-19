@@ -15,8 +15,13 @@ import javax.management.ObjectName;
 
 import javax.management.remote.*;
 
+//Mine
+import javax.management.MBeanInfo;
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanOperationInfo;
 
-public class ClientApp2 {
+
+public class ClientApp4 {
 
 	/**
 	 * @param args
@@ -24,13 +29,17 @@ public class ClientApp2 {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		System.out.println("Todd ClientApp2... Accessing JMX Beans (and the 'Uptime' property of TODD MBean 'Server')");
+		System.out.println("Todd ClientApp4... Accessing JMX Beans (and gorwing the size)");
 
 		try {
 			String server = "192.168.56.11:10500";
+			int growSize = 10;
 
 			if (args.length >= 1) {
 				server = args[0];
+			}
+			if (args.length > 1){
+				growSize = Integer.parseInt(args[1]);
 			}
 
 			System.out.println("Connecting to JMX Agent (with running TODD server) at "+server+" ...");
@@ -48,40 +57,15 @@ public class ClientApp2 {
 			 */
 
 			Set<ObjectInstance> mbeans = mbs.queryMBeans(null, null);
-
-			//for (ObjectInstance mbean : mbeans) {
-			//	System.out.println(mbean.getClassName());
-			//}
-			
-			// Lets try to access the MBean net.jnjmx.todd.Server:
-			ObjectName son = new ObjectName("todd:id=Server");
 			ObjectName son2 = new ObjectName("todd:id=SessionPool");
-			
-			ObjectInstance ob = mbs.getObjectInstance(son);
 			ObjectInstance ob2 = mbs.getObjectInstance(son2);			
-			
-			Long uptime=(Long)mbs.getAttribute(son, "Uptime");
-			Integer sessionSize=(Integer)mbs.getAttribute(son2, "Size");
-			Integer availableSessions=(Integer)mbs.getAttribute(son2, "AvailableSessions");
-			double freeResourcesPercentage = ((double)availableSessions)/((double)sessionSize);
 
-
-
-			System.out.println("sessionSize= "+sessionSize);
-			System.out.println("availableSessions= "+availableSessions);
-			System.out.println("Current available resources => "+freeResourcesPercentage*100+"%");
-			//System.out.println("Uptime=" + uptime);		
-
+			// Now invoking operation to grow
+			// Go through operation to find the interested one and invoke
+			MBeanInfo beanInfo = mbs.getMBeanInfo(son2); //uses Son2
+			mbs.invoke(son2, "grow", new Integer[] {new Integer(growSize)}, new String[] {"int"} );
+			System.out.println("Grow of "+growSize+" sent to server.");
 			c.close();
-
-			if (freeResourcesPercentage < 0.2){
-				System.out.println("Critical Load!");
-				System.exit(2);
-			} else {
-				System.out.println("Load is OK.");					
-				System.exit(0);
-			}
-
 
 		} catch (Exception ex) {
 			System.out.println("Error: unable to connect to MBean Server");

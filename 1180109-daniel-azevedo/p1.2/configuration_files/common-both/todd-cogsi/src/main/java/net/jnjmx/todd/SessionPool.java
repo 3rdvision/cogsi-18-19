@@ -8,6 +8,7 @@ public class SessionPool implements SessionPoolMBean {
 
 	private Set sessions;
 	private int size;
+	private double resourceFreePercentage;
 
 	public SessionPool() {
 		this(POOLSIZE);
@@ -33,6 +34,10 @@ public class SessionPool implements SessionPoolMBean {
 	
 	public synchronized Integer getAvailableSessions() {
 		return new Integer(sessions.size());
+	}
+
+	public synchronized double getResourceFreePercentage() {
+		return ( ((double)sessions.size()) / ((double)size) )*100;
 	}
 
 	public synchronized void release(Session session) {
