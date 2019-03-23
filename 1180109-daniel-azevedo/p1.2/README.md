@@ -437,7 +437,9 @@ define service{
 
 6- If everything is good, restart nagios `sudo systemctl restart nagios.service`
 
-## Configure the remote host to receive JMX notifications when threshold is under 20% of resources and warn nagios host through send_nsca
+Each time there is an overload or recovery, ClientApp3 will automatically trigger everything to notify nagios of the sittuation which may itself do an event handle to grow those resources and get things back to normal by invoking an JMX event to execute the grow() method of Todd.
+
+## Configure the remote host to receive JMX notifications when threshold is under 20% of resources and warn nagios host through send_nsca 
 
 1- Clone the custom repository of TODD `git clone https://dvazevedo@bitbucket.org/mei-isep/todd.git`
 
@@ -453,9 +455,49 @@ The notification trigger will also create a file in /tmp/test with contents that
 
 The content of /tmp/test will have the nagios remote host name, the service name, the return code (0 if OK or 2 if OVERLOAD) and a custom message.
 
-Each time there is an overload or recovery, ClientApp3 will automatically trigger everything to notify nagios of the sittuation which may itself do an event handle to grow those resources and get things back to normal.
+Each time there is an overload or recovery, ClientApp3 will automatically trigger everything to notify nagios of the sittuation which may itself do an event handle to grow those resources and get things back to normal by invoking an JMX event to execute the grow() method of Todd.
 
 To test this feature `gradle runClient5` should be used in order to create 6 dummies for 10 seconds that will fill 6 sessions and surpass the 20% for the default amount of AvailableSessions (8 Sessions).
 
 ** All the implemented JMX code is commented and documented so please check the src for the custom TODD repository as stated in the beggining of this README. **
 
+## Configure JMX to notify nagios when Tomcat server is using too much memory
+
+1- Activate JMX monitoring through remote by adding the necessary parameters in tomcat.
+
+Create a setenv.sh in CATALINA_HOME/bin tomcat location, in this case was `sudo vim /opt/tomcat/latest/bin/setenv.sh`
+
+```bash
+CATALINA_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=6003 -Dcom.sun.management.jmxremote.rmi.port=6003 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=192.168.99.102"
+```
+
+2- Give execute and read permissions `sudo chmod 775 setenv.sh`
+
+3- Restart tomcat and check that te environemnts were introduced by checking the parameters at status
+
+Restart:
+`sudo systemctl restart tomcat`
+
+Check if the JMX enable environement parameteres were correctly set
+`sudo systemctl status tomcat`
+
+4- Add the JMX notification gauge and listener by running `gradle runClientAppTomcat`
+
+5- Add a passive service to receive the passive tomcat overload notifications `sudo vim /usr/local/nagios/etc/objects/vclones.cfg`
+
+Append the following lines to the document:
+```bash
+
+define service{
+        use                             passive-service
+        host_name                       vclone1        
+        service_description             tomcat-passive-load
+        max_check_attempts              1
+        event_handler_enabled           1
+        event_handler                   restart-tomcat
+}
+```
+
+6- Restart tomcat `sudo systemctl restart tomcat.service`
+
+7- Refresh webpage many times rapidly by continuously pressing F5 without releasing - to overload the CPU - and test the receiving of the notification and the triggering of the event to restart tomcat and send an e-mail notification.
