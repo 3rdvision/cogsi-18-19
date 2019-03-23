@@ -84,6 +84,8 @@ In the below steps to reproduce there are more details and explanantions about t
 
 * A notification receiver server running on remote machine that will get notified when the load is >20% and will react by sending a send_nsca command to the nagios machine with the status of the load of TODD AND >10% for the load of Tomcat process CPU.
 
+* Zabbix needs zabbix-java-gateway module to monitor JMX, after configuring the module and restarting zabbix-server and starting zabbix-java-gateway, zabbix can be configured to monitor the JMX parameters of tomcat. More details in the steps to reproduce laster chapter. 
+
 ---
 
 # Steps to reproduce
@@ -501,3 +503,48 @@ define service{
 6- Restart tomcat `sudo systemctl restart tomcat.service`
 
 7- Refresh webpage many times rapidly by continuously pressing F5 without releasing - to overload the CPU - and test the receiving of the notification and the triggering of the event to restart tomcat and send an e-mail notification.
+
+## Configure Zabbix to monitor Tomcat through JMX 
+
+1- Install zabbix-java-gateway `sudo apt install zabbix-java-gateway`
+
+2- Configure zabbix-java-gateway `sudo vim /etc/zabbix/java_server.conf` and add the following lines:
+
+```bash
+JavaGateway=127.0.0.1
+StartJavaPollers=5
+```
+
+3- Restart zabbix and enable and start zabbix-java-gateway
+
+Enable Zabbix-Java-Gateway
+`sudo systemctl enable zabbix-java-gateway`
+
+Restart Zabbix
+`sudo systemctl restart zabbix-server`
+
+Start Zabbix-Java-Gatewway
+`sudo systemctl start zabbix-java-gateway`
+
+4- Go to zabbix web interface at http://<zabbix-ip-address>/zabbix
+
+5- Go to Configuration>Hosts>Add Host
+
+6- Add a new host with name vclone1_tomcat
+
+7- Delete the Agent interface and add a new JMX interface with ip address of the vclone and the port to JMX which was specified in this document as being 6002
+
+8- Go to templates and add "Template App Apache Tomcat JMX"
+
+9- Click the blue Add button to add the new host and wait until the JMX turns green by refreshing the page once every 30 seconds
+
+10- In the Zabbix web interface, go to Monitoring > Graphs and select the host vclone1_Tomcat or the name you configured in step 6 and selec the graph http-8080-worker-threads or any other graph data and the monitoring data will be displayed.
+
+# References
+
+
+
+* https://wiki.scn.sap.com/wiki/pages/viewpage.action?pageId=441453905
+* https://www.zabbix.com/documentation/4.2/pt/manual/concepts/java
+* https://www.youtube.com/watch?v=h6MlF4ztekg -- Zabbix Java Gateway Installation With Tomcat Monitoring
+
