@@ -80,6 +80,18 @@ task runClient4(type:JavaExec, dependsOn: classes) {
    classpath = sourceSets.main.runtimeClasspath
 }
 
+// Execute the ClientAppTomcat
+task runClientAppTomcat (type:JavaExec, dependsOn: classes) {
+   main = 'net.jnjmx.todd.ClientAppTomcat'
+    if (project.hasProperty("appArgs")) {
+        args Eval.me(appArgs)
+    }
+  else {
+      args = ['192.168.99.102:6003']
+    }
+   classpath = sourceSets.main.runtimeClasspath
+}
+
 // Execute the ClientApp5
 task runClient5(type:JavaExec, dependsOn: classes) {
    main = 'net.jnjmx.todd.ClientApp5'
