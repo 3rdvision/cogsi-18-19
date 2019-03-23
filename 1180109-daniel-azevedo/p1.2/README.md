@@ -82,7 +82,7 @@ In the below steps to reproduce there are more details and explanantions about t
 
 * An event listener with a gauge for high and low <20%/>20% for the load of Available Sessions / Size in terms of the property SessionsPool. This gauge will trigger and send a notification that will be handled in a behavior explained in the next point.
 
-* A notification receiver server running on remote machine that will get notified when the load is >20% and will react by sending a send_nsca command to the nagios machine with the status of the load.
+* A notification receiver server running on remote machine that will get notified when the load is >20% and will react by sending a send_nsca command to the nagios machine with the status of the load of TODD AND >10% for the load of Tomcat process CPU.
 
 ---
 
