@@ -18,6 +18,19 @@ STUDENT **Daniel Azevedo** (1180109) - P1.3
 
 ---
 
+
+
+[//]: # (-------------)
+[//]: # (DOCKER NAGIOS)
+[//]: # (https://hub.docker.com/r/ethnchao/nagios/)
+[//]: # (https://hub.docker.com/r/quantumobject/docker-nagios/   -- has sendmail)
+[//]: # (https://hub.docker.com/r/jasonrivers/nagios/)
+[//]: # (DOCKER TOMCAT: )
+[//]: # (https://hub.docker.com/r/bitnami/tomcat/)
+[//]: # (DOCKER UBUNTU TODD: )
+[//]: # (https://hub.docker.com/_/ubuntu  -- 18.04 LTS its the latest)
+[//]: # (-------------)
+
 # Problem Analysis
 
 ## Objective
