@@ -15,7 +15,7 @@ public class ClientApp5 {
 		System.out.println("Todd ClientApp... The 'regular' TODD client application.");
 		
 		try {
-			String server = "192.168.56.11";
+			String server = "172.18.0.3";
 			
 			if (args.length >= 1) {
 				server = args[0];

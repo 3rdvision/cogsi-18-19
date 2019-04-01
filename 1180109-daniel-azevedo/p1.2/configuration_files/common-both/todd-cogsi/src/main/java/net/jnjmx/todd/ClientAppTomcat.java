@@ -79,7 +79,7 @@ public class ClientAppTomcat {
 		System.out.println("Todd ClientApp2... Accessing JMX Beans (and the 'Uptime' property of TODD MBean 'Server')");
 
 		try {
-			String server = "192.168.99.102:6003";
+			String server = "172.18.0.3:6003";
 
 			if (args.length >= 1) {
 				server = args[0];

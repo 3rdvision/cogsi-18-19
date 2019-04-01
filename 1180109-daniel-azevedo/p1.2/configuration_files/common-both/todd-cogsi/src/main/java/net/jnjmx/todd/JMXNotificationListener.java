@@ -23,7 +23,7 @@ public class JMXNotificationListener implements NotificationListener {
         // Server info variables
         String s;
         Process p;
-        String rHostIp = "192.168.99.101";
+        String rHostIp = "172.18.0.2";
         String hostName = "vclone1";
         String hostServiceName = "todd-passive-up";
         String hostServiceName2 = "tomcat-passive-load";
