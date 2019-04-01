@@ -60,15 +60,17 @@ Opened ports:
 * 80:80 - Nagios
 * 6002 - JMX TODD
 * 6003 - JMX Tomcat
-//* - NSCA port
+* 6668 - NRPE port
+* 6667 - NSCA port
 
 Extra requirements:
 * NRPE
-* sendmail
-* all configurations
-* openjdk-8
+* sendEmail
+* configuration files
 * gradle
-
+* git
+* openjdk-8-jdk-headless
+* nsca
 
 TODD services in the right folders
 
@@ -82,10 +84,11 @@ Extra requirements:
 Ports:
 
 * 6002 - JMX TODD
-//* - NSCA port
+* 6667 - NSCA port
 
 3- Tomcat 8 (172.18.0.4)
 * 8080:8080 -- tomcat web port
+* 6668 - NRPE port
 * 6003 - JMX Tomcat
 * JMX enabled config file startup (add that file to the etc of tomcat)
 
@@ -120,22 +123,17 @@ Ports:
 
 4- Verify nagios is running
 
-5- Enter inside the container
-
-Check container id with:
-`docker ps`
-
-`docker exec -it nagios bash`
+5- Enter inside the container `docker exec -it nagios bash`
 
 update repository list
 `apt update`
 
-install vim
-`apt install vim`
+install needed packages
+`apt install vim gradle git openjdk-8-jdk-headless nsca`
 
-6- Inside the container run `nano /opt/nagios/nagios/etc/nagios.cfg`
+6- Inside the container run `vim /opt/nagios/nagios/etc/nagios.cfg`
 
-7- Afterwards add the line to add vclone services as a new object nagios will scan
+7- Afterwards add the line to add vclone services as a new object that nagios will scan
 
 ```bash
 
@@ -451,12 +449,11 @@ CATALINA_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.por
 ```bash
 FROM ubuntu:latest
 RUN apt-get -y update && apt-get -y upgrade
-RUN apt-get -y install openjdk-8-jdk wget ssh nagios-nrpe-server mcollective-plugins-nrpe vim sudo
-RUN mkdir /usr/local/tomcat
-RUN wget http://www-us.apache.org/dist/tomcat/tomcat-8/v8.5.39/bin/apache-tomcat-8.5.39.tar.gz -O /tmp/tomcat.tar.gz
-RUN cd /tmp && tar xvfz tomcat.tar.gz
-RUN cp -Rv /tmp/apache-tomcat-8.5.39/* /usr/local/tomcat/
-CMD ( /usr/local/tomcat/bin/catalina.sh run & ) && service ssh start && service nagios-nrpe-server start && tail -f /dev/null
+RUN apt-get -y install openjdk-8-jdk gradle wget git ssh nagios-nrpe-server vim nsca sudo
+RUN mkdir /home/dan/
+RUN cd /home/dan && git clone https://dvazevedo@bitbucket.org/dvazevedo/todd-cogsi.git
+RUN cd /home/dan/todd-cogsi && gradle build
+CMD cd /home/dan/todd-cogsi && service nsca start && service ssh start && service nagios-nrpe-server start && ( gradle runserverremote & ) && sleep 3 && ( gradle runclient3 & ) && tail -f /dev/null 
 ```
 
 2- Build the image using docker build command
