@@ -42,21 +42,42 @@ STUDENT **Daniel Azevedo** (1180109) - P1.3
 
 ## Objective
 
-* 
+* Use docker as a replacement of virtual machines for doing the same as the previous assignments
 
 ## Requirements:
 
+* Having a monitor container using Nagios
+
+* Having a monitored container using TODD sample application
+
+* Having a monitored container with tomcat
+
+* Implement passive and active checks (with NRPE and JMX) in a similar way to PL1.2
+
+### Alternative
+
+* Design the same schenario but using linux namespaces instead of docker
+
+* For the implementation, do the containerization of Todd
 
 
 ---
 
 # Solution Design
 
+For the solution of this assignement 3 docker container were used and are described below acording to the main responsibility, main network ports for container communication and main required packages (also specified in the dockerfiles).
+
 Containers
 
-1- Image: Nagios (172.18.0.2)
+1- Nagios
 
-Opened ports:
+Base image: jasonrivers/nagios:latest
+
+Dockerfile: No
+
+Network ip address: 172.18.0.2
+
+Used network ports:
 * 80:80 - Nagios
 * 6002 - JMX TODD
 * 6003 - JMX Tomcat
@@ -74,12 +95,29 @@ Extra requirements:
 
 TODD services in the right folders
 
-2- Image: ubuntu (172.18.0.3)
+2- TODD
+
+Dockerfile: Yes
+
+Base image: ubuntu:latest
+
+Network ip address: 172.18.0.3
 
 Extra requirements:
+
 * gradle
 * openjdk-8
-* Todd
+* openjdk-8-jdk-headless
+* gradle
+* wget
+* git
+* ssh
+* nagios-nrpe-server
+* vim
+* nsca
+* sudo
+* TODD
+* JMX (TODD src repository)
 
 Ports:
 
@@ -87,11 +125,32 @@ Ports:
 * 6667 - NSCA port
 
 3- Tomcat 8 (172.18.0.4)
+
+Dockerfile: Yes
+
+Base image: ubuntu:latest
+
+Ports:
+
 * 8080:8080 -- tomcat web port
 * 6668 - NRPE port
 * 6003 - JMX Tomcat
 * JMX enabled config file startup (add that file to the etc of tomcat)
 
+Extra requirements:
+
+* gradle
+* openjdk-8
+* TODD
+* vim
+* sudo
+* git
+* ssh
+* nagios-nrpe-server
+* vim
+* nsca
+* sudo
+* JMX (TODD src repository)
 
 
 ---
