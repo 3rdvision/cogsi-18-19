@@ -60,31 +60,30 @@ STUDENT **Daniel Azevedo** (1180109) - P1.3
 
 * For the implementation, do the containerization of Todd
 
-
 ---
 
 # Solution Design
 
-For the solution of this assignement 3 docker container were used and are described below acording to the main responsibility, main network ports for container communication and main required packages (also specified in the dockerfiles).
+The host machine was running an Arch-based Linux OS with kernel version 4.19.32-1-MANJARO.
 
-Containers
+## Containers
 
-1- Nagios
+## 1- Nagios
 
-Base image: jasonrivers/nagios:latest
+### Base image: jasonrivers/nagios:latest
 
-Dockerfile: No
+### Dockerfile: No
 
-Network ip address: 172.18.0.2
+### Network ip address: 172.18.0.2
 
-Used network ports:
+### Used network ports:
 * 80:80 - Nagios
 * 6002 - JMX TODD
 * 6003 - JMX Tomcat
 * 6668 - NRPE port
 * 6667 - NSCA port
 
-Extra requirements:
+### Extra requirements:
 * NRPE
 * sendEmail
 * configuration files
@@ -95,15 +94,15 @@ Extra requirements:
 
 TODD services in the right folders
 
-2- TODD
+## 2- TODD
 
-Dockerfile: Yes
+### Dockerfile: Yes
 
-Base image: ubuntu:latest
+### Base image: ubuntu:latest
 
-Network ip address: 172.18.0.3
+### Network ip address: 172.18.0.3
 
-Extra requirements:
+### Extra requirements:
 
 * gradle
 * openjdk-8
@@ -119,25 +118,25 @@ Extra requirements:
 * TODD
 * JMX (TODD src repository)
 
-Ports:
+### Ports:
 
 * 6002 - JMX TODD
 * 6667 - NSCA port
 
-3- Tomcat 8 (172.18.0.4)
+## 3- Tomcat 8 (172.18.0.4)
 
-Dockerfile: Yes
+### Dockerfile: Yes
 
-Base image: ubuntu:latest
+### Base image: ubuntu:latest
 
-Ports:
+### Ports:
 
 * 8080:8080 -- tomcat web port
 * 6668 - NRPE port
 * 6003 - JMX Tomcat
 * JMX enabled config file startup (add that file to the etc of tomcat)
 
-Extra requirements:
+### Extra requirements:
 
 * gradle
 * openjdk-8
@@ -152,6 +151,26 @@ Extra requirements:
 * sudo
 * JMX (TODD src repository)
 
+This way, the 3 containers would start and would be operational with no additional commands!
+
+In the end of the configuration of nagios, the 3 docker image were pushed to docker hub with the following images:
+
+* 3rdvision/cogsi-nagios
+* 3rdvision/cogsi-tomcat
+* 3rdvision/cogsi-todd
+
+The only commands to reproduce this tutorial in ** any computer in the world ** with docker and internet access is:
+```bash
+docker network create --subnet=172.18.0.0/16 mynet
+docker run --net mynet --net mynet --ip 172.18.0.2 -d --name nagios 3rdvision/cogsi-nagios
+docker run --net mynet --net mynet --ip 172.18.0.3 -d --name nagios 3rdvision/cogsi-todd
+docker run --net mynet --net mynet --ip 172.18.0.4 -d --name nagios 3rdvision/cogsi-tomcat
+```
+In the end, the repositories can be started with an elegant oneliner:
+
+`docker start nagios todd tomcat`
+
+This solution also allows for the host machine to access any of the JMX services (TODD and Tomcat).
 
 ---
 
@@ -171,7 +190,6 @@ Extra requirements:
 
 1- Create a docker subnet with ip 172.18.0.0 and subnet 255.255.0.0 with `docker network create --subnet=172.18.0.0/16 mynet`
 
-
 ## Create docker nagios container
 
 1- Create the container and assign it to the created subnet with the ip 172.18.0.2 `docker run --net mynet --net mynet --ip 172.18.0.2 -d --name nagios jasonrivers/nagios:latest`
@@ -188,253 +206,58 @@ update repository list
 `apt update`
 
 install needed packages
-`apt install vim gradle git openjdk-8-jdk-headless nsca`
+`apt install vim gradle git openjdk-8-jdk-headless nsca ssh`
+
+start the SSH service
+`etc/init.d/ssh start`
 
 6- Inside the container run `vim /opt/nagios/nagios/etc/nagios.cfg`
 
 7- Afterwards add the line to add vclone services as a new object that nagios will scan
 
 ```bash
-
+cfg_file=/usr/local/nagios/etc/objects/vclones.cfg
 ```
 
-8- Create the previous vlones.cfg file and add the following content
+8- Copy the vclones.cfg file located in configuration_files of this repository to /usr/local/nagios/etc/objects/vclones.cfg
 
-```bash
-###############################################################################
-# LOCALHOST.CFG - SAMPLE OBJECT CONFIG FILE FOR MONITORING THIS MACHINE
-#
-#
-# NOTE: This config file is intended to serve as an *extremely* simple
-#       example of how you can create configuration entries to monitor
-#       the local (Linux) machine.
-#
-###############################################################################
+9- Copy the templates.cfg file located in configuration_files of this repository to  /usr/local/nagios/etc/objects/templates.cfg
 
+10- Copy the commands.cfg file located in configuration_files of this repository to  /usr/local/nagios/etc/objects/commands.cfg
 
+11- Copy the contacts.cfg file located in configuration_files of this repository to  /usr/local/nagios/etc/objects/contacts.cfg
 
-###############################################################################
-#
-# HOST DEFINITION
-#
-###############################################################################
+12- Give execution and run permissions to every single created file ith `cd /opt/nagios/libexec && chmod +rx check_todd_load check_todd_load check_todd_load check_todd_load`
 
-# Define a host for the local machine
-
-define host {
-
-    use                     linux-server            ; Name of host template to use
-                                                    ; This host definition will inherit all variables that are defined
-                                                    ; in (or inherited by) the linux-server host template definition.
-    host_name               vclone1
-    alias                   vclone1
-    address                 192.168.99.102  
-    contact_groups          CogsiGroup1     
-}
-
-
-
-###############################################################################
-#
-# HOST GROUP DEFINITION
-#
-###############################################################################
-
-# Define an optional hostgroup for Linux machines
-
-## deleted
-
-
-###############################################################################
-#
-# SERVICE DEFINITIONS
-#
-###############################################################################
-
-# Define a service to "ping" the local machine
-
-define service {
-
-    use                     local-service           ; Name of service template to use
-    host_name               vclone1
-    service_description     PING
-    check_command           check_ping!100.0,20%!500.0,60%
-}
-
-
-
-# Define a service to check the disk space of the root partition
-# on the local machine.  Warning if < 20% free, critical if
-# < 10% free space on partition.
-
-define service {
-
-    use                     local-service           ; Name of service template to use
-    host_name               vclone1
-    check_interval          1    
-    service_description     Root Partition Guest
-    check_command           check_nrpe!check_disk -a 20% 10% /
-}
-
-
-
-# Define a service to check the number of currently logged in
-# users on the local machine.  Warning if > 20 users, critical
-# if > 50 users.
-
-define service {
-
-    use                     local-service           ; Name of service template to use
-    host_name               vclone1
-    service_description     Current Users Guest
-    check_interval          1
-    check_command           check_nrpe!check_users -a 15 20
-}
-
-## Check swap
-
-define service {
-
-    use                     local-service           ; Name of service template to use
-    host_name               vclone1
-    check_interval          1    
-    service_description     Check Swap Guest
-    check_command           check_nrpe!check_swap
-}
-
-
-# Define a service to check the number of currently running procs
-# on the local machine.  Warning if > 250 processes, critical if
-# > 400 processes.
-
-define service {
-
-    use                     local-service           ; Name of service template to use
-    host_name               vclone1
-    check_interval          1    
-    service_description     Total Processes Guest
-    check_command           check_nrpe!check_procs -a 250 400 RSZDT
-}
-
-
-
-# Define a service to check the load on the local machine.
-
-define service {
-
-    use                     local-service           ; Name of service template to use
-    host_name               vclone1
-    check_interval          1
-    service_description     Current Load Guest
-    check_command           check_nrpe!check_load -a 5.0,4.0,3.0 10.0,6.0,4.0
-}
-
-# Define a service to check SSH on the local machine.
-# Disable notifications for this service by default, as not all users may have SSH enabled.
-
-define service {
-
-    use                     local-service           ; Name of service template to use
-    host_name               vclone1
-    service_description     SSH
-    check_command           check_ssh
-    notifications_enabled   0
-}
-
-
-
-# Define a service to check HTTP on the local machine.
-# Disable notifications for this service by default, as not all users may have HTTP enabled.
-
-define service {
-
-    use                     local-service           ; Name of service template to use
-    check_interval          1
-    host_name               vclone1
-    service_description     HTTP-80
-    check_command           check_http
-    notifications_enabled   0
-}
-
-# My tomcat HTTP service on port 8080
-
-define service {
-
-        use                             local-service
-        host_name                       vclone1
-        service_description             HTTP-Tomcat-8080
-        check_command                   check_http_port
-        check_interval                  1
-        _port_number                    8080
-        event_handler_enabled           1
-        event_handler                   restart-tomcat
-        max_check_attempts              4
-        contacts                        daniel1         
-}
-
-# My todd up service
-
-define service {
-
-        use                             local-service
-        host_name                       vclone1
-        service_description             Todd-Up-Service
-        check_command                   check_todd_up
-        check_interval                  1
-        max_check_attempts              4
-        contacts                        daniel1         
-}
-
-# My todd load service
-
-define service {
-
-        use                             local-service
-        host_name                       vclone1
-        service_description             Todd-Load-Service
-        check_command                   check_todd_load
-        check_interval                  1
-        max_check_attempts              4
-        contacts                        daniel1         
-}
-
-define service{
-        use                             passive-service
-        host_name                       vclone1        
-        service_description             todd-passive-up
-        max_check_attempts              1
-        event_handler_enabled           1
-        event_handler                   grow_todd        
-        _grow_number                    12        
-}
-```
-9- Do the same for templates.cfg file
-
-10- Do same for commands.cfg
-
-11- Do the same for contacts.cfg
-
-12- Repeat the steps for each file of the libexec and give execution and run permissions to every single one of them
-
-x- Uncomment and edit nsca config file to define nagios IP address
+13- Uncomment and edit nsca config file to define nagios IP address
 
 Uncomment and edit the ip address to match nagios's
 ```bash
 server_address=172.18.0.2
-
 ```
 Edit the command file to match nagios output file
 ```bash
 command_file=/opt/nagios/var/rw/nagios.cmd
 ```
 
-xx- Restart nsca service `service nsca restart`
+14- Restart nsca service `service nsca restart`
 
-xxx- Restart with the command /etc/init.d/nagios restart
+15- Restart with the command /etc/init.d/nagios restart
 
-xxx- Verify nagios configuration for errors by executing `/opt/nagios/bin/nagios -v /opt/nagios/etc/nagios.cfg`
+16- Verify nagios configuration for errors by executing `/opt/nagios/bin/nagios -v /opt/nagios/etc/nagios.cfg`
 
-xxxx- Restart nagios by going to the web interface by nagivating to 172.18.0.2 and cliking "Process Info" > "Restart Nagios process"
+17- Copy sendEmail pearl executable file into /usr/local/bin and give execution and read permissions with `chmod +rx /usr/local/bin/sendEmail`
+
+18- Restart nagios by going to the web interface by navigating to 172.18.0.2 and cliking "Process Info" > "Restart Nagios process"
+
+19- Create the TODD executable check commands by creating the executable java files
+
+```bash
+mkdir /home/dan/
+cd /home/dan && git clone https://dvazevedo@bitbucket.org/dvazevedo/todd-cogsi.git && cd todd-cogsi && gradle build
+```
+
+20- You can now exit the bash by typing `exit` and if you wish stop the nagios container using `docker stop nagios` for configuring the other containers. Later we can start this same container only by typing docker start nagios
 
 ##  Build and start the docker container for Tomcat 8.5
 
@@ -524,6 +347,84 @@ docker build -t my-todd:v1 .
 
 3- `docker run --net mynet --ip 172.18.0.3 -d --name todd -td my-todd:v1`
 
+# Alternative: Linux namespaces
+
+Starting from kernel 2.6.24, Linux supports 6 different types of namespaces. Namespaces are useful in creating processes that are more isolated from the rest of the system, without needing to use full low level virtualization technology. The feature works by having the same name space for these resources in the various sets of processes, but those names referring to distinct resources. Examples of resource names that can exist in multiple spaces, so that the named resources are partitioned, are process IDs, hostnames, user IDs, file names, and some names associated with network access, and interprocess communication.
+
+Namespaces are a fundamental aspect of containers on Linux.
+
+The term "namespace" is often used for a type of namespace (e.g. process ID) as well for a particular space of names.
+
+A Linux system starts out with a single namespace of each type, used by all processes. Processes can create additional namespaces and join different namespaces. 
+
+Every time a computer with Linux boots up, it starts with just one process, with process identifier (PID) 1. This process is the root of the process tree, and it initiates the rest of the system by performing the appropriate maintenance work and starting the correct daemons/services. All the other processes start below this process in the tree. The PID namespace allows one to spin off a new tree, with its own PID 1 process. The process that does this remains in the parent namespace, in the original tree, but makes the child the root of its own process tree.
+
+With PID namespace isolation, processes in the child namespace have no way of knowing of the parent process’s existence. However, processes in the parent namespace have a complete view of processes in the child namespace, as if they were any other process in the parent namespace.
+
+
+![](https://uploads.toptal.io/blog/image/674/toptal-blog-image-1416487554032.png)
+
+It is possible to create a nested set of child namespaces: one process starts a child process in a new PID namespace, and that child process spawns yet another process in a new PID namespace, and so on.
+
+With the introduction of PID namespaces, a single process can now have multiple PIDs associated with it, one for each namespace it falls under. In the Linux source code, we can see that a struct named pid, which used to keep track of just a single PID, now tracks multiple PIDs through the use of a struct named `upid`:
+
+```c
+struct upid {
+  int nr;                     // the PID value
+  struct pid_namespace *ns;   // namespace where this PID is relevant
+  // ...
+};
+
+struct pid {
+  // ...
+  int level;                  // number of upids
+  struct upid numbers[0];     // array of upids
+};
+```
+
+To create a new PID namespace, one must call the clone() system call with a special flag CLONE_NEWPID. (C provides a wrapper to expose this system call, and so do many other popular languages.) Whereas the other namespaces discussed below can also be created using the unshare() system call, a PID namespace can only be created at the time a new process is spawned using clone(). Once clone() is called with this flag, the new process immediately starts in a new PID namespace, under a new process tree. This can be demonstrated with a simple C program
+
+```c
+#define _GNU_SOURCE
+#include <sched.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+static char child_stack[1048576];
+
+static int child_fn() {
+  printf("PID: %ld\n", (long)getpid());
+  return 0;
+}
+
+int main() {
+  pid_t child_pid = clone(child_fn, child_stack+1048576, CLONE_NEWPID | SIGCHLD, NULL);
+  printf("clone() = %ld\n", (long)child_pid);
+
+  waitpid(child_pid, NULL, 0);
+  return 0;
+}
+```
+Compile and run this program with root privileges and you will notice an output that resembles this:
+
+```bash
+clone() = 5304
+PID: 1
+```
+
+The PID, as printed from within the child_fn, will be 1.
+
+Even though this namespace tutorial code above is not much longer than “Hello, world” in some languages, a lot has happened behind the scenes. The clone() function, as you would expect, has created a new process by cloning the current one and started execution at the beginning of the child_fn() function. However, while doing so, it detached the new process from the original process tree and created a separate process tree for the new process.
+
+![](https://uploads.toptal.io/blog/image/677/toptal-blog-image-1416545619045.png)
+
+
+
 # References
 
-* 
+* DEI-ISEP slides for Configuração e Gestão de Sistemas 2018/2019
+* https://www.toptal.com/linux/separation-anxiety-isolating-your-system-with-linux-namespaces
+* https://docs.docker.com/v17.12/docker-cloud/builds/push-images/ -- how to push images
+* https://stackoverflow.com/questions/17157721/how-to-get-a-docker-containers-ip-address-from-the-host -- get IP of a container
