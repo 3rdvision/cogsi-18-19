@@ -162,9 +162,9 @@ In the end of the configuration of nagios, the 3 docker image were pushed to doc
 The only commands to reproduce this tutorial in ** any computer in the world ** with docker and internet access is:
 ```bash
 docker network create --subnet=172.18.0.0/16 mynet
-docker run --net mynet --net mynet --ip 172.18.0.2 -d --name nagios 3rdvision/cogsi-nagios
-docker run --net mynet --net mynet --ip 172.18.0.3 -d --name nagios 3rdvision/cogsi-todd
-docker run --net mynet --net mynet --ip 172.18.0.4 -d --name nagios 3rdvision/cogsi-tomcat
+docker run --net mynet --net mynet --ip 172.18.0.2 -d --name nagios -v /path/to/nagios/etc/:/opt/nagios/etc/ -p 0.0.0.0:8080:80 3rdvision/cogsi-nagios
+docker run --net mynet --net mynet --ip 172.18.0.3 -d --name todd 3rdvision/cogsi-todd
+docker run --net mynet --net mynet --ip 172.18.0.4 -d --name tomcat 3rdvision/cogsi-tomcat
 ```
 In the end, the repositories can be started with an elegant oneliner:
 
@@ -408,8 +408,8 @@ int main() {
 }
 ```
 Compile and run this program with root privileges and you will notice an output that resembles this:
-
 ```bash
+
 clone() = 5304
 PID: 1
 ```
