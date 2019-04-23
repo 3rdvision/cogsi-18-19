@@ -1,50 +1,61 @@
-STUDENT **Daniel Azevedo** (1180109) - P1.3
+STUDENT **Daniel Azevedo** (1180109) - P1.4
 ===============================
 [//]: # (EDIT HERE!! /\)
 
-[//]: # (NAGIOS TOOLS)
+[//]: # (NAGIOS)
 [//]: # (-------------)
-[//]: # (Nagios root path)
-[//]: # (/opt/nagios/etc/objects)
 [//]: # (Check Config)
-[//]: # (sudo /opt/nagios/bin/nagios -v /opt/nagios/etc/nagios.cfg)
-[//]: # (Restart Nagios)
-[//]: # (sudo systemctl restart nagios)
+[//]: # (/opt/nagios/bin/nagios -v /opt/nagios/etc/nagios.cfg)
 [//]: # (-------------)
 
 ---
 
-![](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/11/DevOps-Life-Cyce-Nagios-Tutorial-Edureka.png)
+![](https://static1.squarespace.com/static/58939c00bebafb2e19889577/58aeaf4e5016e19bc9091cf5/58aeaf6b46c3c4b688bce67b/1487931589078/GNS3_Logo_Web.jpg?format=1500w)
 
 ---
-
-[//]: # (-------------)
-[//]: # (DOCKER NAGIOS)
-[//]: # (https://hub.docker.com/r/ethnchao/nagios/)
-[//]: # (https://hub.docker.com/r/quantumobject/docker-nagios/   -- has sendmail)
-[//]: # (https://hub.docker.com/r/jasonrivers/nagios/)
-[//]: # (DOCKER TOMCAT: )
-[//]: # (https://hub.docker.com/r/bitnami/tomcat/)
-[//]: # (DOCKER UBUNTU TODD: )
-[//]: # (https://hub.docker.com/_/ubuntu  -- 18.04 LTS its the latest)
-[//]: # (-------------)
-
-[//]: # (NOTES)
-[//]: # (-How to create a new image from a container I modified)
-[//]: # (docker commit <container_id> my_image_name_here)
-[//]: # (-Get container IP)
-[//]: # (docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_name_or_id)
 
 # Problem Analysis
 
 ## Objective
 
+* Simulate a local network with components from the previous exercises
 
 ## Requirements:
 
+### Simulation
+
+* The simulation should include 3 routers, as depicted in the previous figure.
+* The routers should be simulated using a docker image based on quagga (follow the tutorial in https://www.gns3.com/news/article/running-quagga-router-as-a-conta)
+* Include at least one switch in your simulation (see previous figure)
+
+Include in the simulation:
+
+* A monitoring system based on Nagios
+* A system running the Todd Java application
+* A system running Tomcat
+
+* They should be directly connected (or via a switch) to different routers.
+* The simulation should aim at consume the lowest resources of the host system, i.e., using Docker containers.
+
+### Monitoring
+
+* Model the topology of the network in the monitoring system (i.e., use the "parents" attribute in the Nagios configuration of hosts)
+* The monitoring system should include a solution to automatically identify new hosts in the monitored networks.
+* Replicate the monitored solutions developed in the previous exercises (i.e., active and passive monitoring with NRPE, JMX and NSCA).
+* Monitor all the elements in the network (i.e., include routers and switches)
 
 ### Alternative
 
+As an alternative for this exercise, use a different monitoring application
+(i.e., Zabbix vs Nagios)
+
+The scenario should be similar but use an alternative monitoring application.
+
+Use the GNS3/Wireshark integration (i.e., in a link use the "Start Capture" right menu option) to explore differences in the monitoring protocols
+between the Active and Passive monitoring approaches in both monitoring applications.
+
+* How network traffic compares between active and passive?
+* And between Nagios and the Alternative?
 
 ---
 
