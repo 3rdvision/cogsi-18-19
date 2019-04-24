@@ -1,0 +1,20 @@
+configure terminal
+router ospf
+ network 192.168.2.0/24 area 0.0.0.0
+ network 192.168.100.0/24 area 0.0.0.0
+ network 192.168.102.0/24 area 0.0.0.0
+ passive-interface eth0    
+ exit
+interface eth0
+ ip address 192.168.2.254/24
+ exit
+interface eth1
+ ip address 192.168.100.2/24
+ exit
+interface eth2
+ ip address 192.168.102.2/24
+ exit
+exit
+ip forward
+write
+exit 

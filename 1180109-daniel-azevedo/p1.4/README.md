@@ -65,6 +65,8 @@ between the Active and Passive monitoring approaches in both monitoring applicat
 
 # Steps to reproduce
 
+## Install and Configure GNS3
+
 ### Configure Router 1
 
 x- Configure quagga accordingly using vtysh `$ vtysh`
@@ -94,3 +96,5 @@ exit
 # References
 
 * DEI-ISEP slides for Configuração e Gestão de Sistemas 2018/2019
+* https://www.brianlinkletter.com/how-to-build-a-network-of-linux-routers-using-quagga/
+* https://www.brianlinkletter.com/using-open-source-routers-in-gns3/
