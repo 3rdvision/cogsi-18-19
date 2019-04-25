@@ -63,17 +63,30 @@ between the Active and Passive monitoring approaches in both monitoring applicat
 
 ![](https://i.imgur.com/HAp8aO3.png)
 
-Base system: Manjaro Linux - Linux qwe-pc 4.19.34-1-MANJARO #1 SMP PREEMPT Sat Apr 6 08:28:55 UTC 2019 x86_64 GNU/Linux
+* Base system: Manjaro Linux - Linux qwe-pc 4.19.34-1-MANJARO #1 SMP PREEMPT Sat Apr 6 08:28:55 UTC 2019 x86_64 GNU/Linux
 
-GNS3 version: 2.1.16
+* GNS3 version: 2.1.16
 
-A network of 3 routers, 1 switch, 1 NAT (to provide internet access to the hosts - bonus) and 3 end hosts (Tomcat, TODD and Nagios).
+## A network consisted of the following nodes:
+* 3 quagga routers
+* 1 switch
+* 1 NAT (to provide internet access to the hosts - bonus)
+* 3 end hosts (Tomcat, TODD and Nagios).
 
 Routers were using a virtualized container router simulation - quagga - which was based on the docker image: ajnouri/quagga_alpine:latest
 
 As seen in above image, a pyramid-like scheme was used in the network in which in the nagios monitoring system, it was considered the parent and then subsequently, quagga-1 was considered the parent of quagga-2 and quagga-3 which were respectivly parents of todd-gns3-1 and tomcat-gns3-1
 
 ---
+
+# Solution Design (Alternative using Zabbix)
+
+Using the previous network presented below it would be possible to add a zabbix container connected to quagga-1 through eth4, install zabbix agents in nagios, todd and tomcat and monitor all of these machines using the IP Address.
+
+![](https://i.imgur.com/HAp8aO3.png)
+
+The advantage of using Zabbix, is as was stated before to be able to configure everything in the Web GUI and be able to take advantage of the architecture all-in-one-place. 
+It would also be also very simple to connect o JMX by simply adding the IP Address in the configuration of the host, as it is explained in the README.md of the PL1.2. Everything else is the same with the only difference being the IP Addresses.
 
 # Steps to reproduce
 
