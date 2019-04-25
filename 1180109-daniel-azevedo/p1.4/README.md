@@ -61,6 +61,18 @@ between the Active and Passive monitoring approaches in both monitoring applicat
 
 # Solution Design
 
+![](https://i.imgur.com/HAp8aO3.png)
+
+Base system: Manjaro Linux - Linux qwe-pc 4.19.34-1-MANJARO #1 SMP PREEMPT Sat Apr 6 08:28:55 UTC 2019 x86_64 GNU/Linux
+
+GNS3 version: 2.1.16
+
+A network of 3 routers, 1 switch, 1 NAT (to provide internet access to the hosts - bonus) and 3 end hosts (Tomcat, TODD and Nagios).
+
+Routers were using a virtualized container router simulation - quagga - which was based on the docker image: ajnouri/quagga_alpine:latest
+
+As seen in above image, a pyramid-like scheme was used in the network in which in the nagios monitoring system, it was considered the parent and then subsequently, quagga-1 was considered the parent of quagga-2 and quagga-3 which were respectivly parents of todd-gns3-1 and tomcat-gns3-1
+
 ---
 
 # Steps to reproduce
@@ -245,6 +257,8 @@ auto eth1
 iface eth1 inet static
    address 192.168.122.10
    netmask 255.255.255.0
+   gateway 192.168.122.1
+dns-nameservers 8.8.8.8 8.8.4.4
 ```
 
 3- Right click todd docker machine and click "edit config"
@@ -262,6 +276,8 @@ auto eth1
 iface eth1 inet static
    address 192.168.122.20
    netmask 255.255.255.0
+   gateway 192.168.122.1
+dns-nameservers 8.8.8.8 8.8.4.4
 ```
 
 5- Right click tomcat docker machine and click "edit config"
@@ -279,6 +295,8 @@ auto eth1
 iface eth1 inet static
    address 192.168.122.30
    netmask 255.255.255.0
+   gateway 192.168.122.1
+dns-nameservers 8.8.8.8 8.8.4.4
 ```
 
 ### Configuration check for the ip addresses inside the machines
