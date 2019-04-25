@@ -296,6 +296,7 @@ iface eth1 inet static
 - Copy all files from the provided nagios-etc/ which are also in /home/dan/nagios-copy path of the container machine and paste them into this folder and select the option to overrite every occurence
 - Check if server_address property of file /etc/nsca.cfg is set to 192.168.1.1 to bind nsca for the  passive checks to the right address
 - If the address is different, change it and restart nsca service with service nsca restart
+- If nagios pluggin for auto discovery is enabled, if not, install it from this link https://exchange.nagios.org/directory/Plugins/Network-and-Systems-Management/Nagios/check_find_new_hosts/details
 - If the /opt/nagios/etc/vclones.cfg has all the following needed hosts and services:
 
 ```bash
