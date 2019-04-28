@@ -88,6 +88,12 @@ Using the previous network presented below it would be possible to add a zabbix 
 The advantage of using Zabbix, is as was stated before to be able to configure everything in the Web GUI and be able to take advantage of the architecture all-in-one-place. 
 It would also be also very simple to connect o JMX by simply adding the IP Address in the configuration of the host, as it is explained in the README.md of the PL1.2. Everything else is the same with the only difference being the IP Addresses.
 
+## Wireshark captures
+
+In order to analyse the different packets exchange between nagios and the end host being monitored, it's possible to place a packet pacture (by right-clicking the network connection > start capture) and analysing the traffic in **wireshark** using filters like (ip.src==192.168.1.1 && ip.dst==192.168.2.1 && tcp).
+
+Nagios web GUI could be used to commit active checks (or directly from the terminal using send_nrpe command or send_nsca in case of the passsive checks) and traffic could be set to be analysing in that same time window.
+
 # Steps to reproduce
 
 ## Install and Configure GNS3
