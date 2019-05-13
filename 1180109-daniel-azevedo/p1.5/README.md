@@ -56,16 +56,41 @@ STUDENT **Daniel Azevedo** (1180109) - P1.5
 
 # Solution Design
 
-
+Ansible and Vagrant were used as software solutions to setup VMs and provisioning of t
 
 ---
 
 # Steps to reproduce
 
+## Installation of tooling
 
+1- Install vagrant and ansible using pacman `sudo pacman -Syu vagrant ansible`
+
+## Configure vagrant and ansible for the hosts machine
+
+1- Make a new folder and change directory to it `mkdir playbook && cd playbook`
+
+2- Create a file named Vagrantfile which will be used to configure our VMs and insert the following content
+```bash
+
+```
+
+3- Create a file named playbook_todds.yml and insert the following content
+```bash
+
+```
+
+4- Create a file named playbook_tomcats.yml and insert the following content
+```bash
+
+```
+
+5- Create a file named hosts and insert the following content
+```bash
+
+```
 
 # References
-
 
 
 * 

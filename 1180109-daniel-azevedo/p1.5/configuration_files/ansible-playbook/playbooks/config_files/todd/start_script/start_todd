@@ -1,0 +1,5 @@
+#!/bin/bash
+cd /home/dan/todd-cogsi/ && sudo gradle runserverremote &
+
+sleep 20
+cd /home/dan/todd-cogsi/ && sudo gradle runclient3 &

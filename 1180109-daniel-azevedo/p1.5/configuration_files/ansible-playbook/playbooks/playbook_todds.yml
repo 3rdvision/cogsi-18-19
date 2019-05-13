@@ -1,0 +1,73 @@
+---
+- hosts: todds
+
+  become: yes
+  become_method: sudo
+  remote_user: vagrant
+
+  tasks:
+  - name: Update apt packages
+    apt:
+      update_cache: yes
+
+  - name: Install todd packages
+    apt: 
+      name: ['openjdk-8-jdk','gradle','wget','git','ssh','nagios-nrpe-server','vim','nsca','sudo']
+      state: present
+
+  - name: create /home/dan directory
+    file:
+      path: /home/dan
+      state: directory
+      mode: 0755
+
+  - name: git clone 
+    git:
+      repo: 'https://dvazevedo@bitbucket.org/dvazevedo/todd-cogsi.git'
+      dest: /home/dan/todd-cogsi
+      update: no
+
+  - name: Build todd
+    shell: 'cd /home/dan/todd-cogsi && sudo gradle build'
+
+  - name: Copy NRPE config
+    copy:
+       src: config_files/nrpe/nrpe.cfg
+       dest: /etc/nagios/nrpe.cfg
+       mode: 0755
+
+  - name: Copy bash script
+    copy:
+      src: config_files/todd/start_script/start_todd
+      dest: /usr/local/bin/start_todd
+      mode: 0755
+
+  - name: Add nagios user to sudoers
+    become: yes
+    become_method: sudo
+    shell: adduser nagios sudo      
+
+  - name: Make todd autostart crontab
+    become: yes
+    become_method: sudo
+    copy:
+      src: config_files/cron/vagrant
+      dest: /var/spool/cron/crontabs/vagrant
+      mode: 0600
+
+  - name: Enable & start nagios-nrpe
+    service:
+      name: nagios-nrpe-server
+      enabled: yes
+      state: restarted
+
+  - name: Enable & start ssh
+    service:
+      name: ssh
+      enabled: yes
+      state: started      
+
+  - name: Start todd (takes about ~15sec)
+    shell: 'bash start_todd'
+    async: 2592000               # 60*60*24*30 – 1 month    
+    poll: 0

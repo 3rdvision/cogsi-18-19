@@ -1,0 +1,52 @@
+---
+- hosts: tomcats
+
+  become: yes
+  become_method: sudo
+  remote_user: vagrant
+
+  tasks:
+
+  - name: Install Tomcat NRPE and NSCA
+    apt:
+      name: ['tomcat8','nagios-nrpe-server','nsca']
+      state: present
+      update_cache: yes
+
+  - name: Copy JMX setnenv for tomcat
+    copy:
+       src: config_files/tomcat-env/setenv.sh
+       dest: /usr/share/tomcat8/bin/setenv.sh
+       mode: 0775
+
+  - name: Sets env
+    shell: bash /usr/share/tomcat8/bin/setenv.sh  
+
+  - name: Add nagios user to sudoers
+    become: yes
+    become_method: sudo
+    shell: adduser nagios sudo
+
+  - name: Copy NRPE config
+    copy:
+       src: config_files/nrpe/nrpe.cfg
+       dest: /etc/nagios/nrpe.cfg
+       mode: 0755  
+
+  - name: Start and enable Tomcat service
+    systemd:
+      name: tomcat8
+      state: restarted
+      enabled: true
+
+  - name: Enable & restart nagios-nrpe-server
+    service:
+      name: nagios-nrpe-server
+      enabled: yes
+      state: restarted
+
+  - name: Enable & start ssh
+    service:
+      name: ssh
+      enabled: yes
+      state: started
