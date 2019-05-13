@@ -27,6 +27,13 @@
       dest: /home/dan/todd-cogsi
       update: no
 
+  - name: Copy todd buid.gradle config
+    copy:
+      src: config_files/todd/1/build.gradle
+      dest: /home/dan/todd-cogsi/build.gradle
+      mode: 744
+
+
   - name: Build todd
     shell: 'cd /home/dan/todd-cogsi && sudo gradle build'
 
