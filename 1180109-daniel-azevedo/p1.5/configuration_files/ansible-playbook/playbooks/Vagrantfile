@@ -1,10 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
 Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
@@ -16,6 +12,7 @@ Vagrant.configure("2") do |config|
   # Ubuntu 18.04 LTS for all boxes
   config.vm.box = "bento/ubuntu-18.04"
 
+  # The tomcat1 box using ansible provision and the ip 192.168.99.102
   config.vm.define "tomcat1" do |tomcat1|
     tomcat1.vm.box = "bento/ubuntu-18.04"
     tomcat1.vm.network "private_network", ip: "192.168.99.102"
@@ -25,23 +22,25 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  # The tomcat1 box using ansible provision and the ip 192.168.99.103
   config.vm.define "todd1" do |todd1|
     todd1.vm.box = "bento/ubuntu-18.04"
     todd1.vm.network "private_network", ip: "192.168.99.103"
   end
 
+  # The tomcat1 box using ansible provision and the ip 192.168.99.104
   config.vm.define "todd2" do |todd2|
     todd2.vm.box = "bento/ubuntu-18.04"
     todd2.vm.network "private_network", ip: "192.168.99.104"
   end  
 
-  # Ansible Provision for the Todds
+  # Ansible Provision for the Todds (common for todd1 and todd2 boxes)
   config.vm.provision :ansible do |ansible|
     ansible.playbook = "playbook_todds.yml"
     ansible.inventory_path = "hosts"
   end
 
-  # A provision script in vagrantfile
+  # A provision script in vagrantfile which can be used to run scripts in our machines
   #config.vm.provision :shell, path: "bootstrap.sh"
 
 end

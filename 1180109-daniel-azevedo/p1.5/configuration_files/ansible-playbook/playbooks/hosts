@@ -1,4 +1,5 @@
 ---
+nagios ansible_ssh_host=192.168.99.101 ansible_ssh_port=22 ansible_ssh_user=dan ansible_ssh_pass=d326732677
 [tomcats]
 tomcat1 ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_private_key_file=".vagrant/machines/tomcat1/virtualbox/private_key"
 [todds]

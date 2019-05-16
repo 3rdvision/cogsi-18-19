@@ -9,26 +9,46 @@
   - name: Update apt packages
     apt:
       update_cache: yes
+    become: true
 
-  - name: Install nagios and dependencies
-    apt: 
-      name: ['apache2','php','php-cgi','libapache2-mod-php','php-common','php-pear','php-mbstring','nagios3','nagios-plugins','nagios-nrpe-plugin','python-pexpect','python-setuptools','python-pip','openjdk-8-jdk','gradle','wget','git','ssh','nagios-nrpe-server','vim','nsca','sudo']
-      state: present
+  - name: Copy Nagios config
+    copy:
+       src: config_files/nagios/nagios-etc/objects/vclones.cfg
+       dest: /usr/local/nagios/etc/objects/vclones.cfg
+       mode: 0755
+
+  - name: Restart nagios using new config
+    service:
+      name: nagios
+      enabled: yes
+      state: restarted       
+
+  - nagios:
+      action: servicegroup_service_downtime
+      minutes: 30
+      servicegroup: CogsiHostGroup2
+      host: '{{ inventory_hostname }}'      
+
+  # - name: Install nagios and dependencies
+  #   apt: 
+  #     name: ['apache2','php','php-cgi','libapache2-mod-php','php-common','php-pear','php-mbstring','nagios3','nagios-plugins','nagios-nrpe-plugin','python-pexpect','python-setuptools','python-pip','openjdk-8-jdk','gradle','wget','git','ssh','nagios-nrpe-server','vim','nsca','sudo']
+  #     state: present
  
-  - name: install pexpect
-    pip:
-      name: pexpect
-    become: yes
+  # - name: install pexpect
+  #   pip:
+  #     name: pexpect
+  #   become: yes
 
-  - name: Define nagios password
-    expect:
-      command: /bin/bash -c "sudo htpasswd -c /etc/nagios3/htpasswd.users nagiosadmin"
-      responses:
-        (?i)password: "nagios"      
-
+  # - name: Define nagios password
+  #   expect:
+  #     command: /bin/bash -c "sudo htpasswd -c /etc/nagios3/htpasswd.users nagiosadmin"
+  #     responses:
+  #       (?i)password: "nagios"      
 
   # - name: Copy NSCA config
   #   copy:
   #      src: config_files/nagios/nsca/nsca.cfg
   #      dest: /etc/nsca.cfg
   #      mode: 0755
+
+
