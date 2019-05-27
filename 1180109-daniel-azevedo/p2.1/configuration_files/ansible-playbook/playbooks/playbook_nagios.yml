@@ -1,0 +1,109 @@
+---
+- hosts: nagios
+
+  become: yes
+  become_method: sudo
+  remote_user: vagrant
+
+  tasks:
+  - name: Update apt packages
+    apt:
+      update_cache: yes
+    become: true
+
+  - name: Copy Nagios config
+    copy:
+       src: config_files/nagios/nagios-etc/
+       dest: /usr/local/nagios/etc/
+       mode: 0755
+
+  - name: Copy NRPE config
+    copy:
+       src: config_files/nrpe/nrpe.cfg
+       dest: /etc/nagios/nrpe.cfg
+       mode: 0755      
+
+  - name: git clone 
+    git:
+      repo: 'https://dvazevedo@bitbucket.org/dvazevedo/todd-cogsi.git'
+      dest: /home/dan/todd-cogsi
+      update: no
+
+  - name: Copy todd buid.gradle config
+    copy:
+      src: config_files/todd/nagios_build_gradle/build.gradle
+      dest: /home/dan/todd-cogsi/build.gradle
+      mode: 744
+
+  - name: Copy bash start todd script
+    copy:
+      src: config_files/todd/start_script/start_todd
+      dest: /usr/local/bin/start_todd
+      mode: 0755
+
+  - name: Copy restart todd bash script
+    copy:
+      src: config_files/todd/restart_script/restart_todd
+      dest: /usr/local/bin/restart_todd
+      mode: 0755      
+
+  - name: Copy stop todd bash script
+    copy:
+      src: config_files/todd/stop_script/stop_todd
+      dest: /usr/local/bin/stop_todd
+      mode: 0755          
+
+  - name: Copy todd unit systemd service
+    become: yes
+    become_method: sudo  
+    copy:
+      src: config_files/todd/unit/
+      dest: /etc/systemd/system/
+      mode: 0644              
+      
+  - name: restart systemd deamon
+    become: yes
+    become_method: sudo  
+    shell: 'systemctl daemon-reload'
+
+  - name: Enable & start nagios-nrpe
+    service:
+      name: nagios-nrpe-server
+      enabled: yes
+      state: restarted
+
+  - name: Restart nagios using new config
+    service:
+      name: nagios
+      enabled: yes
+      state: restarted             
+
+  - name: Enable & start todd
+    service:
+      name: todd
+      enabled: yes
+      state: restarted      
+
+  # - name: Install nagios and dependencies
+  #   apt: 
+  #     name: ['apache2','php','php-cgi','libapache2-mod-php','php-common','php-pear','php-mbstring','nagios3','nagios-plugins','nagios-nrpe-plugin','python-pexpect','python-setuptools','python-pip','openjdk-8-jdk','gradle','wget','git','ssh','nagios-nrpe-server','vim','nsca','sudo']
+  #     state: present
+ 
+  # - name: install pexpect
+  #   pip:
+  #     name: pexpect
+  #   become: yes
+
+  # - name: Define nagios password
+  #   expect:
+  #     command: /bin/bash -c "sudo htpasswd -c /etc/nagios3/htpasswd.users nagiosadmin"
+  #     responses:
+  #       (?i)password: "nagios"      
+
+  # - name: Copy NSCA config
+  #   copy:
+  #      src: config_files/nagios/nsca/nsca.cfg
+  #      dest: /etc/nsca.cfg
+  #      mode: 0755
+
+
