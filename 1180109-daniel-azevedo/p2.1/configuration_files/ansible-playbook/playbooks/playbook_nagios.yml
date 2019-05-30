@@ -29,6 +29,9 @@
       dest: /home/dan/todd-cogsi
       update: no
 
+  - name: Build todd
+    shell: 'cd /home/dan/todd-cogsi && sudo gradle build'      
+
   - name: Copy todd buid.gradle config
     copy:
       src: config_files/todd/nagios_build_gradle/build.gradle

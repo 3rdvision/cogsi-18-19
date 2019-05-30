@@ -1,0 +1,162 @@
+pipeline {
+
+    agent any
+
+    environment{
+        good = 'Aprove and deploy to production.'
+        NEXUS_VERSION = "nexus3"
+        NEXUS_PROTOCOL = "http"
+        NEXUS_URL = "localhost:8081"
+        NEXUS_REPOSITORY = "repository-cogsi"
+        NEXUS_CREDENTIAL_ID = "nexus"   
+        VAGRANT_PATH = "/home/qwe/Documents/cogsi-18-19-thursday-1180109/1180109-daniel-azevedo/p2.1/configuration_files/ansible-playbook/playbooks/"   
+    }
+
+    stages {
+
+        stage('SMC Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'dvazevedo', url: 'https://dvazevedo@bitbucket.org/dvazevedo/todd-cogsi.git']]])
+            }
+        }
+
+        stage('Build TODD project') {
+            steps {
+                echo 'Going for CMS project directory and building...'    
+                sh '''cd $WORKSPACE
+            gradle build'''}
+        }
+
+        stage("Archive to nexus") {
+
+            steps {
+
+                echo 'Stage to archive artifacts to nexus'
+
+                script {
+
+                    // Find built artifact under build/lib folder
+
+                    echo 'Workspace variable is is: ${WORKSPACE}'
+                    echo 'doing ls to workspace...'
+                    sh 'ls -la ${WORKSPACE}/build/libs'
+
+                    filesByGlob = findFiles(glob: "**/*.jar");
+
+                    // Print some info from the artifact found
+
+                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+
+                    // Extract the path from the File found
+
+                    artifactPath = filesByGlob[0].path;
+
+                    // Assign to a boolean response verifying If the artifact name exists
+
+                    artifactExists = fileExists artifactPath;
+
+                    if(artifactExists) {
+
+                        echo "*** File: ${artifactPath}";
+
+                        nexusArtifactUploader(
+
+                            nexusVersion: NEXUS_VERSION,
+
+                            protocol: NEXUS_PROTOCOL,
+
+                            nexusUrl: NEXUS_URL,
+
+                            groupId: 'pt.ipp.isep.dei',
+
+                            version: '0.1',
+
+                            repository: NEXUS_REPOSITORY,
+
+                            credentialsId: NEXUS_CREDENTIAL_ID,
+
+                            artifacts: [
+
+                                // Artifact generated such as .jar, .ear and .war files.
+
+                                [artifactId: 'dazevedo.todd',
+
+                                classifier: '',
+
+                                file: artifactPath,
+
+                                type: 'jar']
+
+                            ]
+
+                        );
+
+                    } else {
+
+                        error "*** File: ${artifactPath}, could not be found";
+
+                    }
+
+                }
+
+            }
+
+        }        
+
+        stage('Ask user question to deploy'){
+            steps{
+                //insert input for the UI acceptance test
+                script {    
+                    env.UIACCEPTANCE = input message: 'User input required. Deploy?',
+                    ok: 'Deploy',
+                    parameters: [choice(name: 'Acceptance result', choices: "${good}", description: 'Do you approve the deployment')]
+                }
+            }
+        }
+
+        stage('SMC Checkout VM Machines') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'dvazevedo', url: 'https://dvazevedo@bitbucket.org/mei-isep/cogsi-18-19-thursday-1180109.git']]])
+            }
+        }        
+
+        stage('Deployment'){
+            steps{
+                echo 'Starting nagios VM...'
+                sh '''
+                sudo -H -u qwe bash -c "nohup VBoxHeadless -startvm "ubuntu-cogsi-nagios" & "
+                '''
+                
+                echo 'Nagios VM started.'
+                echo 'Now deploying to todd1 through vagrant...'
+                script{
+                    sh '''
+                    sudo -H -u qwe bash -c "cd /home/qwe/Documents/cogsi-18-19-thursday-1180109/1180109-daniel-azevedo/p2.1/configuration_files/ansible-playbook/playbooks/ && vagrant up"
+                    sudo -H -u qwe bash -c "cd /home/qwe/Documents/cogsi-18-19-thursday-1180109/1180109-daniel-azevedo/p2.1/configuration_files/ansible-playbook/playbooks/ && vagrant provision"
+                    '''
+                }
+                echo 'Deployed to todd1'
+                echo 'Now deploying to nagios'
+                script{
+                    sh '''
+                    sudo -H -u qwe bash -c 'cd /home/qwe/Documents/cogsi-18-19-thursday-1180109/1180109-daniel-azevedo/p2.1/configuration_files/ansible-playbook/playbooks/ && ansible-playbook playbook_nagios.yml'
+                    '''
+                }
+
+                script{
+                    echo 'SUCCESS!!!\n Remember you can control the machines state using ansible and vagrant from now on! :)'
+                }
+
+                script{
+                   if (env.UIACCEPTANCE=='Aprove and deploy to production.'){
+                        echo 'User accepted the deployment..'
+                        //Deployment to production conditional
+                        echo 'deploy to production with ansible'
+                    } else {
+                        echo 'User didn\'t accept the deployment. Deployment stopped.'
+                    }
+                }
+            }
+        }
+    }
+}
