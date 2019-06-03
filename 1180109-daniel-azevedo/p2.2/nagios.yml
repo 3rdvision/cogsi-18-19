@@ -1,0 +1,126 @@
+---
+- name: Provision nagios
+  hosts: host1
+  become: yes
+  tasks:
+    - name: update apt cache
+      apt: update_cache=yes
+    - name: Set timezone to Europe/Lisbon
+      timezone:
+        name: Europe/Lisbon
+    - name: Ensure Nagios requirements
+      apt:
+        # name: ['autoconf', 'gcc', 'libc6', 'make', 'apache2', 'php', 'libapache2-mod-php7.2', 'libgd-dev', 'python3-passlib']
+        # name: ['build-essential', 'apache2', 'php', 'apache2-mod-php7.0', 'php-gd', 'libgd-dev', 'sendmail', 'unzip']
+        name: ['autoconf', 'gcc', 'libc6', 'make', 'wget', 'unzip', 'apache2', 'php', 'libapache2-mod-php7.0', 'libgd2-xpm-dev', 'python3-passlib']
+    - name: Download Nagios
+      unarchive:
+        src: https://github.com/NagiosEnterprises/nagioscore/archive/nagios-4.4.3.tar.gz
+        copy: no
+        dest: /home/vagrant/
+        creates: /home/vagrant/nagioscore-nagios-4.4.3
+    - name: Run ./configure for Nagios
+      shell: './configure --with-httpd-conf=/etc/apache2/sites-enabled'
+      args:
+        chdir: /home/vagrant/nagioscore-nagios-4.4.3
+    - name: Compile Nagios
+      make:
+        chdir: /home/vagrant/nagioscore-nagios-4.4.3
+        target: all
+    - name: Make install-groups-users
+      make:
+        chdir: /home/vagrant/nagioscore-nagios-4.4.3
+        target: install-groups-users
+    - name: Create Nagios user and group
+      user:
+        name: nagios
+        group: nagios
+    - name: Add www-data to nagios group
+      user:
+        name: nagios
+        group: www-data
+        append: yes
+    - name: Make install
+      make:
+        chdir: /home/vagrant/nagioscore-nagios-4.4.3
+        target: install
+    - name: Intall install-daemoninit
+      make:
+        chdir: /home/vagrant/nagioscore-nagios-4.4.3
+        target: install-daemoninit
+    - name: Intall install-commandmode
+      make:
+        chdir: /home/vagrant/nagioscore-nagios-4.4.3
+        target: install-commandmode
+    - name: Intall install-config
+      make:
+        chdir: /home/vagrant/nagioscore-nagios-4.4.3
+        target: install-config
+    - name: Intall install-webconf
+      make:
+        chdir: /home/vagrant/nagioscore-nagios-4.4.3
+        target: install-webconf
+    - name: Install apache config files
+      make:
+        chdir: /home/vagrant/nagioscore-nagios-4.4.3
+        target: install-webconf
+    - name: Configure Apache
+      shell: "{{ item }}"
+      args:
+        chdir: /home/vagrant/nagioscore-nagios-4.4.3
+      with_items:
+        - 'a2enmod rewrite'
+        - 'a2enmod cgi'
+    - name: Create nagiosadmin
+      htpasswd:
+        path: /usr/local/nagios/etc/htpasswd.users
+        name: nagiosadmin
+        password: nagios
+    - name: Restart apache2
+      systemd:
+        name: apache2
+        state: reloaded
+    - name: Start Nagios
+      systemd:
+        name: nagios
+        state: started
+        enabled: yes
+    - name: Ensure Nagios plugins requirements
+      apt:
+        name: ['autoconf', 'automake', 'autopoint', 'gcc', 'libc6', 'libmcrypt-dev', 'make', 'libssl-dev', 'wget', 'bc', 'gawk', 'dc', 'build-essential', 'snmp', 'libnet-snmp-perl', 'gettext']
+    - name: Download Nagios plugins
+      unarchive:
+        src: https://github.com/nagios-plugins/nagios-plugins/archive/release-2.2.1.tar.gz
+        copy: no
+        dest: /home/vagrant/
+        creates: /home/vagrant/nagios-plugins-release-2.2.1
+    - name: Run ./tools/setup for Nagios plugins
+      shell: './tools/setup'
+      args:
+        chdir: /home/vagrant/nagios-plugins-release-2.2.1
+#    - name: Run autoreconf
+#      shell: 'autoreconf -i'
+#      args:
+#        chdir: /home/vagrant/nagios-plugins-release-2.2.1
+    - name: Run ./configure for Nagios plugins
+      shell: './configure'
+      args:
+        chdir: /home/vagrant/nagios-plugins-release-2.2.1
+    - name: Make for Nagios plugins
+      shell: 'make'
+      args:
+        chdir: /home/vagrant/nagios-plugins-release-2.2.1
+    - name: Make install for Nagios plugins
+      shell: 'make install'
+      args:
+        chdir: /home/vagrant/nagios-plugins-release-2.2.1
+    - name: Install Nagios NRPE plugin
+      apt:
+        name: nagios-nrpe-plugin
+    - name: Recursively change ownership of /usr/local/nagios/var/rw/
+      file:
+        path: /usr/local/nagios/var/rw/
+        state: directory
+        recurse: yes
+        owner: nagios
+        group: www-data

@@ -1,0 +1,17 @@
+---
+- name: Configure nagios
+  hosts: host1
+  become: yes
+  tasks:
+    - name: Copy nagios.cfg file to server
+      copy:
+        src: ./nagios-cfg/nagios.cfg
+        dest: /usr/local/nagios/etc/nagios.cfg
+    - name: Copy otherhosts.cfg file to server
+      copy:
+        src: ./nagios-cfg/otherhosts.cfg
+        dest: /usr/local/nagios/etc/objects/otherhosts.cfg
+    - name: Restart Nagios
+      systemd:
+        name: nagios
+        state: reloaded

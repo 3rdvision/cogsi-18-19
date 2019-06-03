@@ -1,0 +1,14 @@
+#
+# Some links related to this playbook:
+# https://community.i2b2.org/wiki/display/getstarted/2.4.2.3+Run+Wildfly+as+a+Linux+Service
+# https://github.com/fmarchioni/mastertheboss/tree/master/ansible/wildfly-standalone
+# http://www.mastertheboss.com/howto/jboss-config/provisioning-wildfly-10-with-ansible
+#
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: update apt cache
+      apt: update_cache=yes
+    - name: install jdk
+      apt: name=openjdk-8-jdk-headless state=present
