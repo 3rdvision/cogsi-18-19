@@ -1,6 +1,6 @@
 ---
 - name: Configure nagios
-  hosts: host1
+  hosts: host2
   become: yes
   tasks:
     # sudo apt-get install *

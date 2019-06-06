@@ -1,0 +1,4 @@
+#!/bin/bash
+sudo pkill -f gradle &
+sleep 2
+echo stopped todd

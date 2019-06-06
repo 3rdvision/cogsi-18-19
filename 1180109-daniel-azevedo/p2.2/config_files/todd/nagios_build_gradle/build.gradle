@@ -1,0 +1,118 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+//def ip_address = "192.168.99.103"
+def getLocalIp(String interfaceName) {
+    NetworkInterface iface =  NetworkInterface.getByName(interfaceName);
+    for (InterfaceAddress address : iface.getInterfaceAddresses()) {
+        String ip =  address.getAddress().getHostAddress()
+        if (ip.length() <= 15) {
+            return ip;
+        }
+    }
+}
+def ip_address = getLocalIp("eth1")
+def port = "6002"
+def tomcat_port = "6003"
+
+// Execute the Server (local JMX only)
+task runServer(type:JavaExec, dependsOn: classes) {
+   main = 'net.jnjmx.todd.Server'
+    if (project.hasProperty("appArgs")) {
+        jvmArgs Eval.me(appArgs)
+    }
+	else {
+	   jvmArgs = ['-Dcom.sun.management.jmxremote']
+	}
+ 
+   classpath = sourceSets.main.runtimeClasspath
+}
+
+// Execute the Server (enable remote JMX)
+task runServerRemote(type:JavaExec, dependsOn: classes) {
+   main = 'net.jnjmx.todd.Server'
+    if (project.hasProperty("appArgs")) {
+        jvmArgs Eval.me(appArgs)
+    }
+	else {
+	   jvmArgs = ['-Dcom.sun.management.jmxremote',
+              '-Dcom.sun.management.jmxremote.port=6002',
+              '-Dcom.sun.management.jmxremote.rmi.port=6002',
+              '-Dcom.sun.management.jmxremote.authenticate=false',
+              '-Dcom.sun.management.jmxremote.local.only=false',
+              '-Dcom.sun.management.jmxremote.ssl=false',
+              "-Djava.rmi.server.hostname=${ip_address}"]
+    }
+   classpath = sourceSets.main.runtimeClasspath
+}
+
+// Execute the Client
+task runClient(type:JavaExec, dependsOn: classes) {
+   main = 'net.jnjmx.todd.ClientApp'
+    if (project.hasProperty("appArgs")) {
+        args Eval.me(appArgs)
+    }
+	else {
+   		args = ["${ip_address}"]
+   }
+   classpath = sourceSets.main.runtimeClasspath
+}
+
+// Execute the ClientApp2
+task runClient2(type:JavaExec, dependsOn: classes) {
+   main = 'net.jnjmx.todd.ClientApp2'
+    if (project.hasProperty("appArgs")) {
+        args Eval.me(appArgs)
+    }
+	else {
+     args = ["${ip_address}:${port}"]
+     }
+   classpath = sourceSets.main.runtimeClasspath
+}
+
+// Execute the ClientApp3
+task runClient3(type:JavaExec, dependsOn: classes) {
+   main = 'net.jnjmx.todd.ClientApp3'
+    if (project.hasProperty("appArgs")) {
+        args Eval.me(appArgs)
+    }
+	else {
+   		args = ["${ip_address}:${port}"]
+   	}
+   classpath = sourceSets.main.runtimeClasspath
+}
+
+// Execute the ClientApp4
+task runClient4(type:JavaExec, dependsOn: classes) {
+   main = 'net.jnjmx.todd.ClientApp4'
+    if (project.hasProperty("appArgs")) {
+        args Eval.me(appArgs)
+    }
+  else {
+      args = ["${ip_address}:${port}","11"]
+    }
+   classpath = sourceSets.main.runtimeClasspath
+}
+
+// Execute the ClientAppTomcat
+task runClientAppTomcat (type:JavaExec, dependsOn: classes) {
+   main = 'net.jnjmx.todd.ClientAppTomcat'
+    if (project.hasProperty("appArgs")) {
+        args Eval.me(appArgs)
+    }
+  else {
+      args = ["${ip_address}:${tomcat_port}"]
+    }
+   classpath = sourceSets.main.runtimeClasspath
+}
+
+// Execute the ClientApp5
+task runClient5(type:JavaExec, dependsOn: classes) {
+   main = 'net.jnjmx.todd.ClientApp5'
+    if (project.hasProperty("appArgs")) {
+        args Eval.me(appArgs)
+    }
+	else {
+   		args = ["${ip_address}"]
+   }
+   classpath = sourceSets.main.runtimeClasspath
+}

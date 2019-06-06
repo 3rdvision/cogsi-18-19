@@ -1,0 +1,1 @@
+{"virtualbox":{"/vagrant":{"mount_options":["dmode=755,fmode=600","uid=1000","gid=1000"],"guestpath":"/vagrant","hostpath":"/home/qwe/Documents/cogsi-18-19-thursday-1180109/1180109-daniel-azevedo/p2.2","disabled":false,"__vagrantfile":true}}}

@@ -1,0 +1,6 @@
+#!/bin/bash
+sudo pkill -f gradle &
+sleep 2
+echo now starting todd...
+start_todd &
+echo restarted todd

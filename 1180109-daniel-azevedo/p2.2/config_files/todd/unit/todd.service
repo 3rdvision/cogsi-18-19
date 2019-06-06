@@ -1,0 +1,12 @@
+[Unit]
+Description=My TODD cogsi app
+After=network.target
+
+[Service]
+Type=simple
+User=vagrant
+WorkingDirectory=/home/dan/todd-cogsi
+ExecStart=/usr/local/bin/start_todd
+
+[Install]
+WantedBy=multi-user.target

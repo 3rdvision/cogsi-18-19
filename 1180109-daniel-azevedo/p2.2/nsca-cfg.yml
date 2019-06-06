@@ -1,0 +1,18 @@
+---
+- hosts: host1
+  become: yes
+  become_method: sudo
+  remote_user: vagrant
+  tasks:
+
+  - name: Copy nsca.cfg file to server
+    copy:
+      src: ./nagios-cfg/nsca/nsca.cfg
+      dest: /etc/nsca.cfg   
+      mode: 0644              
+
+  - name: Enable & Restart NSCA
+    service:
+      name: nsca
+      enabled: yes
+      state: restarted      
