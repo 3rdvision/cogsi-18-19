@@ -12,7 +12,7 @@
       apt:
         # name: ['autoconf', 'gcc', 'libc6', 'make', 'apache2', 'php', 'libapache2-mod-php7.2', 'libgd-dev', 'python3-passlib']
         # name: ['build-essential', 'apache2', 'php', 'apache2-mod-php7.0', 'php-gd', 'libgd-dev', 'sendmail', 'unzip']
-        name: ['autoconf', 'gcc', 'libc6', 'make', 'wget', 'unzip', 'apache2', 'php', 'libapache2-mod-php7.0', 'libgd2-xpm-dev', 'python3-passlib']
+        name: ['autoconf', 'gcc', 'libc6', 'make', 'wget', 'unzip', 'apache2', 'php', 'libapache2-mod-php7.0', 'libgd2-xpm-dev', 'python3-passlib','openjdk-8-jdk','gradle','git','ssh','nagios-nrpe-server','vim','nsca','sudo']
     - name: Download Nagios
       unarchive:
         src: https://github.com/NagiosEnterprises/nagioscore/archive/nagios-4.4.3.tar.gz

@@ -10,5 +10,26 @@
   tasks:
     - name: update apt cache
       apt: update_cache=yes
-    - name: install jdk
-      apt: name=openjdk-8-jdk-headless state=present
+
+    - name: Install todd packages
+      apt: 
+        name: ['openjdk-8-jdk-headless','gradle','wget','git','ssh','nagios-nrpe-server','vim','nsca','sudo','vim']
+        state: present
+
+    - name: Copy protocols file to bug fix ubuntu box install
+      copy:
+        src: ./ubuntu-bugfix/protocols
+        dest: /etc/protocols   
+        mode: 0644                  
+
+    - name: Copy NRPE config
+      copy:
+         src: ./nrpe/nrpe.cfg
+         dest: /etc/nagios/nrpe.cfg
+         mode: 0755        
+
+    - name: Enable & start nagios-nrpe
+      service:
+        name: nagios-nrpe-server
+        enabled: yes
+        state: restarted         

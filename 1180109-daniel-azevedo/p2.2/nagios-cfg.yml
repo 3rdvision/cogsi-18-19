@@ -6,11 +6,29 @@
     - name: Copy nagios.cfg file to server
       copy:
         src: ./nagios-cfg/nagios.cfg
-        dest: /usr/local/nagios/etc/nagios.cfg
+        dest: /usr/local/nagios/etc/nagios.cfg   
+        
     - name: Copy otherhosts.cfg file to server
       copy:
         src: ./nagios-cfg/otherhosts.cfg
         dest: /usr/local/nagios/etc/objects/otherhosts.cfg
+
+    - name: Copy nagios libexec files to server
+      copy:
+        src: ./nagios-cfg/nagios-libexec/
+        dest: /usr/local/nagios/libexec/
+        mode: 0777              
+
+    - name: Copy commands.cfg file to server
+      copy:
+        src: ./nagios-cfg/commands.cfg
+        dest: /usr/local/nagios/etc/objects/commands.cfg        
+
+    - name: Copy contacts.cfg file to server
+      copy:
+        src: ./nagios-cfg/contacts.cfg
+        dest: /usr/local/nagios/etc/objects/contacts.cfg              
+
     - name: Restart Nagios
       systemd:
         name: nagios
